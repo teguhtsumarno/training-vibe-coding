@@ -1,0 +1,49 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Employee {
+  id         String   @id @default(uuid())
+  name       String
+  department String
+  position   String
+  username   String?  @unique
+  password   String?
+  role       String   // "user" | "approval1" | "approval2" | "admin"
+  
+  // Relations
+  leaveRequests    LeaveRequest[] @relation("EmployeeLeaves")
+  approvalRequests LeaveRequest[] @relation("ApproverLeaves")
+}
+
+model LeaveRequest {
+  id          String   @id @default(uuid())
+  employeeId  String
+  approval1Id String
+  startDate   String
+  endDate     String
+  reason      String
+  status      String   // "PENDING_APPROVAL1" | "PENDING_APPROVAL2" | "APPROVED" | "REJECTED"
+
+  // Relations
+  employee    Employee @relation("EmployeeLeaves", fields: [employeeId], references: [id], onDelete: Cascade)
+  approval1   Employee @relation("ApproverLeaves", fields: [approval1Id], references: [id], onDelete: Cascade)
+  history     ApprovalHistory[]
+}
+
+model ApprovalHistory {
+  id             String       @id @default(uuid())
+  leaveRequestId String
+  action         String       // "CREATED", "APPROVED_L1", "APPROVED_L2", "APPROVED", "REJECTED"
+  actorId        String?
+  actorName      String?
+  createdAt      DateTime     @default(now())
+
+  // Relations
+  leaveRequest   LeaveRequest @relation(fields: [leaveRequestId], references: [id], onDelete: Cascade)
+}
