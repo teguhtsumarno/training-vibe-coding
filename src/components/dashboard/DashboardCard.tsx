@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DashboardCardProps {
   title: string;
-  value: number;
+  value: number | string;
   description: string;
   icon: React.ReactNode;
   variant?: "red" | "blue";

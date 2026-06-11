@@ -40,6 +40,7 @@ export default function EmployeeTable({ employees, onDelete }: EmployeeTableProp
             <TableHead className="font-heading font-semibold text-white tracking-wider">Name</TableHead>
             <TableHead className="font-heading font-semibold text-white tracking-wider">Department</TableHead>
             <TableHead className="font-heading font-semibold text-white tracking-wider">Position</TableHead>
+            <TableHead className="font-heading font-semibold text-white tracking-wider">Role</TableHead>
             <TableHead className="font-heading font-semibold text-white tracking-wider text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -52,6 +53,7 @@ export default function EmployeeTable({ employees, onDelete }: EmployeeTableProp
               <TableCell className="font-medium text-white">{employee.name}</TableCell>
               <TableCell className="text-muted-foreground">{employee.department}</TableCell>
               <TableCell className="text-muted-foreground">{employee.position}</TableCell>
+              <TableCell className="text-muted-foreground capitalize">{employee.role}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   <Button 

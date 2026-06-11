@@ -16,7 +16,7 @@ import { type Employee } from "@/types/employee";
 import { Check, X, Calendar, Edit, Trash, Clock } from "lucide-react";
 
 interface LeaveRequestTableProps {
-  leaveRequests: LeaveRequest[];
+  leaveRequests: (LeaveRequest & { leaveType?: { id: string; name: string } | null })[];
   employees: Employee[];
   userRole: string;
   onApprove: (id: string) => void;
@@ -61,6 +61,7 @@ export default function LeaveRequestTable({
         <TableHeader className="bg-black/40 border-b border-white/5">
           <TableRow className="border-b border-white/5 hover:bg-transparent">
             <TableHead className="font-heading font-semibold text-white tracking-wider">Employee</TableHead>
+            <TableHead className="font-heading font-semibold text-white tracking-wider">Jenis Cuti</TableHead>
             <TableHead className="font-heading font-semibold text-white tracking-wider">Start Date</TableHead>
             <TableHead className="font-heading font-semibold text-white tracking-wider">End Date</TableHead>
             <TableHead className="hidden sm:table-cell font-heading font-semibold text-white tracking-wider">Reason</TableHead>
@@ -78,6 +79,11 @@ export default function LeaveRequestTable({
               >
                 <TableCell className="font-medium text-white">
                   {employee?.name ?? "Unknown"}
+                </TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    {request.leaveType?.name ?? "—"}
+                  </span>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(request.startDate)}</TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(request.endDate)}</TableCell>

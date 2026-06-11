@@ -18,4 +18,6 @@ export const ROUTES = {
   EMPLOYEES_EDIT: "/employees/edit",
   LEAVE: "/leave",
   LEAVE_NEW: "/leave/new",
+  LEAVE_TYPES: "/leave-types",
+  CALENDAR: "/calendar",
 } as const;

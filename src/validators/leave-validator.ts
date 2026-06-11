@@ -4,6 +4,7 @@ export const leaveRequestSchema = z
   .object({
     employeeId: z.string().min(1, "Employee is required"),
     approval1Id: z.string().min(1, "Approval L1 is required"),
+    leaveTypeId: z.string().min(1, "Jenis cuti wajib dipilih"),
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().min(1, "End date is required"),
     reason: z.string().min(10, "Reason must be at least 10 characters"),

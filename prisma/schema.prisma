@@ -8,23 +8,48 @@ generator client {
 }
 
 model Employee {
-  id         String   @id @default(uuid())
-  name       String
-  department String
-  position   String
-  username   String?  @unique
-  password   String?
-  role       String   // "user" | "approval1" | "approval2" | "admin"
+  id           String   @id @default(uuid())
+  name         String
+  department   String
+  position     String
+  username     String?  @unique
+  password     String?
+  role         String   // "user" | "approval1" | "approval2" | "admin"
   
   // Relations
   leaveRequests    LeaveRequest[] @relation("EmployeeLeaves")
   approvalRequests LeaveRequest[] @relation("ApproverLeaves")
+  leaveBalances    EmployeeLeaveBalance[]
+}
+
+model LeaveType {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  defaultBalance Int      @default(12)
+  description    String?
+  
+  // Relations
+  leaveRequests       LeaveRequest[]
+  employeeBalances    EmployeeLeaveBalance[]
+}
+
+model EmployeeLeaveBalance {
+  id          String   @id @default(uuid())
+  employeeId  String
+  leaveTypeId String
+  balance     Int
+  
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id], onDelete: Cascade)
+  
+  @@unique([employeeId, leaveTypeId])
 }
 
 model LeaveRequest {
   id          String   @id @default(uuid())
   employeeId  String
   approval1Id String
+  leaveTypeId String?
   startDate   String
   endDate     String
   reason      String
@@ -33,6 +58,7 @@ model LeaveRequest {
   // Relations
   employee    Employee @relation("EmployeeLeaves", fields: [employeeId], references: [id], onDelete: Cascade)
   approval1   Employee @relation("ApproverLeaves", fields: [approval1Id], references: [id], onDelete: Cascade)
+  leaveType   LeaveType? @relation(fields: [leaveTypeId], references: [id])
   history     ApprovalHistory[]
 }
 

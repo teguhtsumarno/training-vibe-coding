@@ -35,15 +35,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const newEmployee = await prisma.employee.create({
-      data: {
-        name,
-        department,
-        position,
-        username: username || null,
-        password: password ? hashPassword(password) : null,
-        role,
-      },
+    const newEmployee = await prisma.$transaction(async (tx) => {
+      // 1. Create employee
+      const emp = await tx.employee.create({
+        data: {
+          name,
+          department,
+          position,
+          username: username || null,
+          password: password ? hashPassword(password) : null,
+          role,
+        },
+      });
+
+      // 2. Auto-assign leave balances from all existing leave types
+      const leaveTypes = await tx.leaveType.findMany();
+      if (leaveTypes.length > 0) {
+        await tx.employeeLeaveBalance.createMany({
+          data: leaveTypes.map((lt) => ({
+            employeeId: emp.id,
+            leaveTypeId: lt.id,
+            balance: lt.defaultBalance,
+          })),
+        });
+      }
+
+      return emp;
     });
 
     return NextResponse.json({ success: true, data: newEmployee }, { status: 201 });

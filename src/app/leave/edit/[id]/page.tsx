@@ -76,6 +76,7 @@ export default function EditLeavePage() {
         defaultValues={{
           employeeId: leaveRequest.employeeId,
           approval1Id: leaveRequest.approval1Id,
+          leaveTypeId: leaveRequest.leaveTypeId || "",
           startDate: leaveRequest.startDate,
           endDate: leaveRequest.endDate,
           reason: leaveRequest.reason,

@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Users, Clock, CheckCircle, XCircle, CalendarRange } from "lucide-react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { getAllEmployees } from "@/services/employee-storage";
 import { getAllLeaveRequests } from "@/services/leave-storage";
+import { getEmployeeLeaveBalances } from "@/services/leave-type-storage";
 import { useAuth } from "@/hooks/useAuth";
+import { type EmployeeLeaveBalance } from "@/types/leave";
 
 export default function DashboardGrid() {
   const [totalEmployees, setTotalEmployees] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [approvedCount, setApprovedCount] = useState(0);
   const [rejectedCount, setRejectedCount] = useState(0);
+  const [leaveBalances, setLeaveBalances] = useState<EmployeeLeaveBalance[]>([]);
 
   const { session } = useAuth();
 
@@ -36,6 +39,12 @@ export default function DashboardGrid() {
         }
       }
 
+      // Fetch per-type leave balances
+      if (session.employeeId) {
+        const balances = await getEmployeeLeaveBalances(session.employeeId);
+        setLeaveBalances(balances);
+      }
+
       setPendingCount(visibleRequests.filter((r) => r.status.startsWith("PENDING")).length);
       setApprovedCount(visibleRequests.filter((r) => r.status === "APPROVED").length);
       setRejectedCount(visibleRequests.filter((r) => r.status === "REJECTED").length);
@@ -55,6 +64,16 @@ export default function DashboardGrid() {
           variant="blue"
         />
       )}
+      {leaveBalances.map((bal) => (
+        <DashboardCard
+          key={bal.id}
+          title={bal.leaveType?.name || "Leave Balance"}
+          value={`${bal.balance} Days`}
+          description={`Remaining ${(bal.leaveType?.name || "leave").toLowerCase()} quota`}
+          icon={<CalendarRange className="h-5 w-5" />}
+          variant="blue"
+        />
+      ))}
       <DashboardCard
         title="Pending Requests"
         value={pendingCount}

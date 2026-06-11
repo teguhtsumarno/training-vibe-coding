@@ -12,11 +12,17 @@ const getNavLinks = (role?: string) => {
   
   if (role === "admin") {
     links.push({ href: ROUTES.EMPLOYEES, label: "Employees" });
+    links.push({ href: ROUTES.LEAVE_TYPES, label: "Leave Types" });
     links.push({ href: ROUTES.LEAVE, label: "All Leave Requests" });
   } else if (role === "approval1" || role === "approval2") {
     links.push({ href: ROUTES.LEAVE, label: "Approvals" });
   } else {
     links.push({ href: ROUTES.LEAVE, label: "My Leave" });
+  }
+
+  // Calendar accessible by admin, approval1, approval2
+  if (role === "admin" || role === "approval1" || role === "approval2") {
+    links.push({ href: ROUTES.CALENDAR, label: "Calendar" });
   }
   
   return links;
