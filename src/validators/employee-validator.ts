@@ -6,6 +6,7 @@ export const employeeSchema = z.object({
   position: z.string().min(1, "Position is required"),
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("Format email tidak valid").or(z.literal("")),
   role: z.enum(["user", "approval1", "approval2", "admin"]),
 });
 

@@ -13,6 +13,7 @@ const getNavLinks = (role?: string) => {
   if (role === "admin") {
     links.push({ href: ROUTES.EMPLOYEES, label: "Employees" });
     links.push({ href: ROUTES.LEAVE_TYPES, label: "Leave Types" });
+    links.push({ href: ROUTES.SMTP_SETTINGS, label: "SMTP" });
     links.push({ href: ROUTES.LEAVE, label: "All Leave Requests" });
   } else if (role === "approval1" || role === "approval2") {
     links.push({ href: ROUTES.LEAVE, label: "Approvals" });

@@ -43,7 +43,7 @@ export async function PUT(
       return NextResponse.json({ success: false, error: "Employee not found" }, { status: 404 });
     }
 
-    const { name, department, position, username, password, role } = body;
+    const { name, department, position, username, password, email, role } = body;
 
     // Check username uniqueness if changing
     if (username && username !== existing.username) {
@@ -63,6 +63,7 @@ export async function PUT(
         ...(position !== undefined && { position }),
         ...(username !== undefined && { username: username || null }),
         ...(password !== undefined && password !== "" && { password: hashPassword(password) }),
+        ...(email !== undefined && { email: email || null }),
         ...(role !== undefined && { role }),
       },
     });

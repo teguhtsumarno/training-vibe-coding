@@ -14,6 +14,7 @@ model Employee {
   position     String
   username     String?  @unique
   password     String?
+  email        String?
   role         String   // "user" | "approval1" | "approval2" | "admin"
   
   // Relations
@@ -72,4 +73,16 @@ model ApprovalHistory {
 
   // Relations
   leaveRequest   LeaveRequest @relation(fields: [leaveRequestId], references: [id], onDelete: Cascade)
+}
+
+model SmtpSettings {
+  id       String  @id @default("singleton")
+  host     String
+  port     Int     @default(587)
+  secure   Boolean @default(false)
+  user     String
+  password String
+  fromName String  @default("Leave Management System")
+  fromEmail String
+  enabled  Boolean @default(true)
 }

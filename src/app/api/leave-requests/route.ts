@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendEmail, buildLeaveCreatedEmail } from "@/lib/email";
 
 export async function GET() {
   try {
@@ -111,6 +112,28 @@ export async function POST(req: NextRequest) {
 
       return reqCreated;
     });
+
+    // 3. Send email notification to Approval L1
+    try {
+      const approver = await prisma.employee.findUnique({ where: { id: approval1Id } });
+      console.log("[Email Debug] Approver found:", approver?.name, "email:", approver?.email);
+      if (approver?.email) {
+        const emailData = buildLeaveCreatedEmail({
+          employeeName: employee.name,
+          leaveTypeName: leaveType.name,
+          startDate,
+          endDate,
+          reason,
+          approverName: approver.name,
+        });
+        const result = await sendEmail({ to: approver.email, ...emailData });
+        console.log("[Email Debug] Send result:", result);
+      } else {
+        console.log("[Email Debug] No email found for approver, skipping notification");
+      }
+    } catch (emailError) {
+      console.error("[Email Debug] Failed to send notification:", emailError);
+    }
 
     return NextResponse.json({ success: true, data: newRequest }, { status: 201 });
   } catch (error) {

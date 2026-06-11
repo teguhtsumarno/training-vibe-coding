@@ -32,7 +32,7 @@ export default function EmployeeForm({ defaultValues, onSubmit, isEdit = false }
     formState: { errors, isSubmitting },
   } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
-    defaultValues: defaultValues ?? { name: "", department: "", position: "", username: "", password: "", role: "user" },
+    defaultValues: defaultValues ?? { name: "", department: "", position: "", username: "", password: "", email: "", role: "user" },
   });
 
   return (
@@ -104,6 +104,21 @@ export default function EmployeeForm({ defaultValues, onSubmit, isEdit = false }
               <p className="text-xs font-medium text-red-500">{errors.password.message}</p>
             )}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-sm font-semibold text-white tracking-wide">Email</Label>
+          <Input 
+            id="email" 
+            type="email"
+            placeholder="employee@company.com" 
+            {...register("email")} 
+            className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+          />
+          {errors.email && (
+            <p className="text-xs font-medium text-red-500">{errors.email.message}</p>
+          )}
+          <p className="text-xs text-muted-foreground">Digunakan untuk notifikasi email pengajuan cuti</p>
         </div>
 
         <div className="space-y-2">

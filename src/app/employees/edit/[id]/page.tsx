@@ -61,6 +61,7 @@ export default function EditEmployeePage() {
           position: employee.position,
           username: employee.username || "",
           password: employee.password || "",
+          email: employee.email || "",
           role: employee.role || "user",
         }}
         onSubmit={handleSubmit}

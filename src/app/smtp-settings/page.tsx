@@ -1,0 +1,372 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import ProtectedRoute from "@/components/shared/ProtectedRoute";
+import { useAuth } from "@/hooks/useAuth";
+import { ROUTES } from "@/constants";
+import { Mail, Send, Shield, Server, Eye, EyeOff } from "lucide-react";
+
+type SmtpForm = {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  password: string;
+  fromName: string;
+  fromEmail: string;
+  enabled: boolean;
+};
+
+const DEFAULT_FORM: SmtpForm = {
+  host: "",
+  port: 587,
+  secure: false,
+  user: "",
+  password: "",
+  fromName: "Leave Management System",
+  fromEmail: "",
+  enabled: true,
+};
+
+export default function SmtpSettingsPage() {
+  const router = useRouter();
+  const { session } = useAuth();
+  const [form, setForm] = useState<SmtpForm>(DEFAULT_FORM);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [hasExisting, setHasExisting] = useState(false);
+
+  useEffect(() => {
+    if (session && session.role !== "admin") {
+      router.push(ROUTES.DASHBOARD);
+    }
+  }, [session, router]);
+
+  const fetchSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/smtp-settings");
+      const json = await res.json();
+      if (json.success && json.data) {
+        setForm(json.data);
+        setHasExisting(true);
+      }
+    } catch {
+      // No settings yet
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
+  const handleSave = async () => {
+    if (!form.host || !form.user || !form.fromEmail) {
+      toast.error("Host, User, dan From Email wajib diisi");
+      return;
+    }
+    setSaving(true);
+    try {
+      const payload = { ...form, enabled: form.enabled === true };
+      console.log("[SMTP Save] Sending:", JSON.stringify({ ...payload, password: "***" }));
+      const res = await fetch("/api/smtp-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success("Pengaturan SMTP berhasil disimpan");
+        setHasExisting(true);
+        // Preserve the enabled state from what we sent, since response data is reliable
+        setForm({ ...json.data, enabled: json.data.enabled });
+      } else {
+        toast.error(json.error || "Gagal menyimpan");
+      }
+    } catch {
+      toast.error("Gagal menyimpan pengaturan SMTP");
+    }
+    setSaving(false);
+  };
+
+  const handleTest = async () => {
+    if (!testEmail) {
+      toast.error("Masukkan email tujuan test");
+      return;
+    }
+    setTesting(true);
+    try {
+      const res = await fetch("/api/smtp-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          testRecipient: testEmail,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success("Email test berhasil dikirim! Periksa inbox Anda.");
+      } else {
+        toast.error(json.error || "Gagal mengirim test email");
+      }
+    } catch {
+      toast.error("Gagal mengirim test email");
+    }
+    setTesting(false);
+  };
+
+  const updateField = (field: keyof SmtpForm, value: any) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  if (session?.role !== "admin") return null;
+
+  return (
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <div className="min-h-screen p-4 sm:p-8 pt-24 md:pt-8">
+        <div className="max-w-2xl mx-auto space-y-8">
+          {/* Header */}
+          <div>
+            <h1 className="text-3xl font-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
+              Pengaturan SMTP
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Konfigurasi server email untuk notifikasi pengajuan cuti
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-16 text-muted-foreground">Loading...</div>
+          ) : (
+            <div className="space-y-6">
+              {/* Status Card */}
+              <div className={`rounded-2xl border p-5 shadow-lg ${
+                hasExisting && form.enabled
+                  ? "bg-emerald-500/5 border-emerald-500/20 shadow-emerald-500/5"
+                  : "bg-amber-500/5 border-amber-500/20 shadow-amber-500/5"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
+                      hasExisting && form.enabled
+                        ? "bg-emerald-500/20 border-emerald-500/30"
+                        : "bg-amber-500/20 border-amber-500/30"
+                    }`}>
+                      <Mail className={`h-5 w-5 ${hasExisting && form.enabled ? "text-emerald-400" : "text-amber-400"}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white text-sm">
+                        {hasExisting
+                          ? form.enabled ? "Notifikasi Email Aktif" : "Notifikasi Email Nonaktif"
+                          : "Belum Dikonfigurasi"
+                        }
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {hasExisting
+                          ? form.enabled ? `Server: ${form.host}:${form.port}` : "Notifikasi email dinonaktifkan"
+                          : "Isi konfigurasi di bawah untuk mengaktifkan notifikasi email"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{form.enabled ? "ON" : "OFF"}</span>
+                    <Switch
+                      checked={form.enabled}
+                      onCheckedChange={(checked) => updateField("enabled", checked)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SMTP Configuration Form */}
+              <div className="bg-[#09090b] border border-white/5 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-blue-500/5 space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Server className="h-4 w-4 text-blue-400" />
+                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Server SMTP</h2>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="sm:col-span-2 space-y-2">
+                    <Label className="text-sm font-semibold text-white tracking-wide">SMTP Host</Label>
+                    <Input
+                      value={form.host}
+                      onChange={(e) => updateField("host", e.target.value)}
+                      placeholder="smtp.gmail.com"
+                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-white tracking-wide">Port</Label>
+                    <Input
+                      type="number"
+                      value={form.port}
+                      onChange={(e) => updateField("port", Number(e.target.value))}
+                      placeholder="587"
+                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div>
+                    <span className="text-sm font-semibold text-white">SSL/TLS (Secure)</span>
+                    <p className="text-xs text-muted-foreground">Aktifkan untuk port 465</p>
+                  </div>
+                  <Switch
+                    checked={form.secure}
+                    onCheckedChange={(checked) => updateField("secure", checked)}
+                  />
+                </div>
+
+                <hr className="border-white/5" />
+                
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-4 w-4 text-purple-400" />
+                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Autentikasi</h2>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-white tracking-wide">Username / Email</Label>
+                    <Input
+                      value={form.user}
+                      onChange={(e) => updateField("user", e.target.value)}
+                      placeholder="user@example.com"
+                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-white tracking-wide">Password / App Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        value={form.password}
+                        onChange={(e) => updateField("password", e.target.value)}
+                        placeholder="••••••••"
+                        className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="border-white/5" />
+                
+                <div className="flex items-center gap-2 mb-2">
+                  <Mail className="h-4 w-4 text-red-400" />
+                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Pengirim</h2>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-white tracking-wide">Nama Pengirim</Label>
+                    <Input
+                      value={form.fromName}
+                      onChange={(e) => updateField("fromName", e.target.value)}
+                      placeholder="Leave Management System"
+                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-white tracking-wide">Email Pengirim</Label>
+                    <Input
+                      value={form.fromEmail}
+                      onChange={(e) => updateField("fromEmail", e.target.value)}
+                      placeholder="noreply@company.com"
+                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="flex-1 bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-red-500/20 py-2.5 font-semibold transition-all duration-300 border-0"
+                  >
+                    {saving ? "Menyimpan..." : "Simpan Pengaturan"}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Test Email Section */}
+              <div className="bg-[#09090b] border border-white/5 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-blue-500/5 space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Send className="h-4 w-4 text-emerald-400" />
+                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Test Koneksi SMTP</h2>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Kirim email test untuk memastikan konfigurasi SMTP sudah benar.
+                </p>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-white tracking-wide">Email Tujuan Test</Label>
+                  <Input
+                    value={testEmail}
+                    onChange={(e) => setTestEmail(e.target.value)}
+                    placeholder="your-email@example.com"
+                    className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleTest}
+                  disabled={testing || !testEmail}
+                  variant="outline"
+                  className="w-full border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 hover:border-emerald-500/30 rounded-xl py-2.5 font-semibold transition-all duration-300"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {testing ? "Mengirim..." : "Kirim Test Email"}
+                </Button>
+              </div>
+
+              {/* Info Card */}
+              <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-5 space-y-3">
+                <h3 className="font-heading font-bold text-blue-400 text-sm">📧 Kapan email dikirim?</h3>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-0.5">1.</span>
+                    <span><strong className="text-white">Employee mengajukan cuti</strong> → Notifikasi ke Approval L1</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-0.5">2.</span>
+                    <span><strong className="text-white">Approval L1 menyetujui</strong> → Notifikasi ke Approval L2</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-0.5">3.</span>
+                    <span><strong className="text-white">Approval L2 menyetujui</strong> → Notifikasi ke Employee (cuti disetujui)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-400 mt-0.5">4.</span>
+                    <span><strong className="text-white">Cuti ditolak</strong> → Notifikasi ke Employee (cuti ditolak)</span>
+                  </li>
+                </ul>
+                <p className="text-xs text-muted-foreground/60 mt-2">
+                  💡 Email notifikasi dikirim ke field <strong>email</strong> pada data employee. Pastikan field email sudah terisi dengan alamat email yang valid.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+}

@@ -20,4 +20,5 @@ export const ROUTES = {
   LEAVE_NEW: "/leave/new",
   LEAVE_TYPES: "/leave-types",
   CALENDAR: "/calendar",
+  SMTP_SETTINGS: "/smtp-settings",
 } as const;

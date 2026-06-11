@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, department, position, username, password, role } = body;
+    const { name, department, position, username, password, email, role } = body;
 
     if (!name || !department || !position || !role) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
           position,
           username: username || null,
           password: password ? hashPassword(password) : null,
+          email: email || null,
           role,
         },
       });
