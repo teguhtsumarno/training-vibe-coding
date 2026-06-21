@@ -11,12 +11,12 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import LeaveStatusBadge from "@/components/leave/LeaveStatusBadge";
-import { type LeaveRequest } from "@/types/leave";
+import { type LeaveRequestWithRelations } from "@/types/leave";
 import { type Employee } from "@/types/employee";
 import { Check, X, Calendar, Edit, Trash, Clock } from "lucide-react";
 
 interface LeaveRequestTableProps {
-  leaveRequests: (LeaveRequest & { leaveType?: { id: string; name: string } | null })[];
+  leaveRequests: LeaveRequestWithRelations[];
   employees: Employee[];
   userRole: string;
   onApprove: (id: string) => void;

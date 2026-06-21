@@ -14,9 +14,14 @@ export default function NewEmployeePage() {
   const router = useRouter();
 
   const handleSubmit = async (data: EmployeeFormValues) => {
-    await createEmployee(data);
-    toast.success("Employee created successfully");
-    router.push(ROUTES.EMPLOYEES);
+    try {
+      await createEmployee(data);
+      toast.success("Employee created successfully");
+      router.push(ROUTES.EMPLOYEES);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Gagal membuat data karyawan";
+      toast.error(message);
+    }
   };
 
   return (

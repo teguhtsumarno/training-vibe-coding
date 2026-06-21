@@ -22,7 +22,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("GET SMTP settings error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch SMTP settings" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil pengaturan SMTP" }, { status: 500 });
   }
 }
 
@@ -32,14 +32,14 @@ export async function PUT(req: NextRequest) {
     const { host, port, secure, user, password, fromName, fromEmail, enabled } = body;
 
     if (!host || !user || !fromEmail) {
-      return NextResponse.json({ success: false, error: "Host, User, and From Email are required" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Host, User, dan From Email wajib diisi" }, { status: 400 });
     }
 
     const existing = await prisma.smtpSettings.findUnique({
       where: { id: "singleton" },
     });
 
-    const dataToSave: any = {
+    const dataToSave = {
       host,
       port: port !== undefined ? Number(port) : 587,
       secure: secure !== undefined ? Boolean(secure) : false,
@@ -78,7 +78,7 @@ export async function PUT(req: NextRequest) {
     });
   } catch (error) {
     console.error("PUT SMTP settings error:", error);
-    return NextResponse.json({ success: false, error: "Failed to save SMTP settings" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal menyimpan pengaturan SMTP" }, { status: 500 });
   }
 }
 
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     const { host, port, secure, user, password, fromEmail, testRecipient } = body;
 
     if (!host || !user || !fromEmail || !testRecipient) {
-      return NextResponse.json({ success: false, error: "All fields including test recipient are required" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Semua field termasuk penerima uji coba wajib diisi" }, { status: 400 });
     }
 
     // Get actual password (if masked, read from DB)
@@ -126,12 +126,13 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    return NextResponse.json({ success: true, message: "Test email sent successfully!" });
-  } catch (error: any) {
+    return NextResponse.json({ success: true, message: "Email uji coba berhasil dikirim" });
+  } catch (error: unknown) {
     console.error("SMTP test error:", error);
+    const errMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json({
       success: false,
-      error: `Koneksi SMTP gagal: ${error.message || "Unknown error"}`,
+      error: `Koneksi SMTP gagal: ${errMessage}`,
     }, { status: 400 });
   }
 }

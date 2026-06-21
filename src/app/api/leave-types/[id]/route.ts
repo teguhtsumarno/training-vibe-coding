@@ -85,7 +85,7 @@ export async function DELETE(
     // Delete the leave type (cascades to EmployeeLeaveBalance)
     await prisma.leaveType.delete({ where: { id } });
 
-    return NextResponse.json({ success: true, message: "Leave type deleted successfully" });
+    return NextResponse.json({ success: true, message: "Jenis cuti berhasil dihapus" });
   } catch (error) {
     console.error("DELETE leave type API error:", error);
     return NextResponse.json({ success: false, error: "Gagal menghapus jenis cuti" }, { status: 500 });

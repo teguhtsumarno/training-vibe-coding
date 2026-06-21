@@ -11,7 +11,7 @@ import EmployeeTable from "@/components/employee/EmployeeTable";
 import EmployeeSearchBar from "@/components/employee/EmployeeSearchBar";
 import EmployeeDeleteDialog from "@/components/employee/EmployeeDeleteDialog";
 import { getAllEmployees, deleteEmployee } from "@/services/employee-storage";
-import { deleteLeaveRequestsByEmployeeId } from "@/services/leave-storage";
+
 import { type Employee } from "@/types/employee";
 import { ROUTES } from "@/constants";
 
@@ -47,7 +47,7 @@ export default function EmployeesPage() {
       setDeleteLoading(true);
       try {
         await deleteEmployee(deleteTarget.id);
-        await deleteLeaveRequestsByEmployeeId(deleteTarget.id);
+
         toast.success(`Employee "${deleteTarget.name}" deleted successfully`);
         loadEmployees();
       } catch (error) {

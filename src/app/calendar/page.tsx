@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import { getAllEmployees } from "@/services/employee-storage";
 import { type LeaveRequest } from "@/types/leave";
 import { type Employee } from "@/types/employee";
 import { ROUTES } from "@/constants";
+import { calculateDuration } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Calendar, Users, Clock } from "lucide-react";
 
 const DAYS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
@@ -421,7 +422,7 @@ export default function CalendarPage() {
                 const color = employeeColorMap.get(item.employee.id) || EMPLOYEE_COLORS[0];
                 const start = new Date(item.request.startDate);
                 const end = new Date(item.request.endDate);
-                const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+                const duration = calculateDuration(item.request.startDate, item.request.endDate);
 
                 return (
                   <div

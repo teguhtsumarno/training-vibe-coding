@@ -38,6 +38,11 @@ export async function PUT(
       return NextResponse.json({ success: false, error: "Jenis cuti dan jumlah saldo wajib diisi" }, { status: 400 });
     }
 
+    const balanceNum = Number(balance);
+    if (isNaN(balanceNum) || balanceNum < 0) {
+      return NextResponse.json({ success: false, error: "Jumlah saldo tidak boleh negatif" }, { status: 400 });
+    }
+
     const updated = await prisma.employeeLeaveBalance.upsert({
       where: {
         employeeId_leaveTypeId: {

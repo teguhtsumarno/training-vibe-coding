@@ -86,9 +86,10 @@ export default function EmployeeBalancesPage() {
         )
       );
       toast.success("Balance updated successfully");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update balance:", error);
-      toast.error(error.message || "Failed to update balance");
+      const message = error instanceof Error ? error.message : "Gagal memperbarui saldo cuti";
+      toast.error(message);
     } finally {
       setSavingId(null);
     }
@@ -185,7 +186,7 @@ export default function EmployeeBalancesPage() {
               </TableHeader>
               <TableBody>
                 {balances.map((balance) => {
-                  const leaveType = (balance as any).leaveType;
+                  const leaveType = balance.leaveType;
                   const changed = hasChanged(balance.leaveTypeId, balance.balance);
                   const isSaving = savingId === balance.leaveTypeId;
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildLeaveCreatedEmail } from "@/lib/email";
+import { calculateDuration } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -43,35 +44,33 @@ export async function POST(req: NextRequest) {
     }
 
     // Calculate duration in days (inclusive)
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+    const duration = calculateDuration(startDate, endDate);
 
     if (duration <= 0) {
       return NextResponse.json({ success: false, error: "Tanggal selesai tidak boleh sebelum tanggal mulai" }, { status: 400 });
     }
 
-    // Check per-type balance
-    const employeeBalance = await prisma.employeeLeaveBalance.findUnique({
-      where: {
-        employeeId_leaveTypeId: {
-          employeeId,
-          leaveTypeId,
-        },
-      },
-    });
-
-    const currentBalance = employeeBalance?.balance ?? 0;
-
-    if (currentBalance < duration) {
-      return NextResponse.json({ 
-        success: false, 
-        error: `Jatah ${leaveType.name} tidak mencukupi! Sisa saldo: ${currentBalance} hari, sedangkan pengajuan Anda: ${duration} hari.` 
-      }, { status: 400 });
-    }
-
     const newRequest = await prisma.$transaction(async (tx) => {
-      // 1. Create leave request
+      // 1. Check balance INSIDE transaction (prevents race condition)
+      //    Using findFirst inside tx ensures row-level lock in PostgreSQL
+      const employeeBalance = await tx.employeeLeaveBalance.findUnique({
+        where: {
+          employeeId_leaveTypeId: {
+            employeeId,
+            leaveTypeId,
+          },
+        },
+      });
+
+      const currentBalance = employeeBalance?.balance ?? 0;
+
+      if (currentBalance < duration) {
+        throw new Error(
+          `INSUFFICIENT_BALANCE:Jatah ${leaveType.name} tidak mencukupi! Sisa saldo: ${currentBalance} hari, sedangkan pengajuan Anda: ${duration} hari.`
+        );
+      }
+
+      // 2. Create leave request
       const reqCreated = await tx.leaveRequest.create({
         data: {
           employeeId,
@@ -95,7 +94,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // 2. Decrement per-type leave balance
+      // 3. Decrement per-type leave balance (atomic)
       await tx.employeeLeaveBalance.update({
         where: {
           employeeId_leaveTypeId: {
@@ -111,6 +110,9 @@ export async function POST(req: NextRequest) {
       });
 
       return reqCreated;
+    }, {
+      isolationLevel: "Serializable",
+      timeout: 15000,
     });
 
     // Fire-and-forget: send email notification to Approval L1 in background
@@ -135,6 +137,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: newRequest }, { status: 201 });
   } catch (error) {
+    // Handle insufficient balance thrown from inside transaction
+    if (error instanceof Error && error.message.startsWith("INSUFFICIENT_BALANCE:")) {
+      const userMessage = error.message.replace("INSUFFICIENT_BALANCE:", "");
+      return NextResponse.json({ success: false, error: userMessage }, { status: 400 });
+    }
     console.error("POST leave request API error:", error);
     return NextResponse.json({ success: false, error: "Gagal membuat pengajuan cuti" }, { status: 500 });
   }

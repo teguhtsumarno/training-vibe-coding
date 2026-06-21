@@ -13,7 +13,7 @@ export async function GET(
     });
 
     if (!leaveRequest) {
-      return NextResponse.json({ success: false, error: "Leave request not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Pengajuan cuti tidak ditemukan" }, { status: 404 });
     }
 
     const history = await prisma.approvalHistory.findMany({
@@ -24,6 +24,6 @@ export async function GET(
     return NextResponse.json({ success: true, data: history });
   } catch (error) {
     console.error("GET leave request history API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch approval history" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil riwayat persetujuan" }, { status: 500 });
   }
 }

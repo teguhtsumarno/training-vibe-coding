@@ -13,51 +13,22 @@ import {
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants";
+import { getNavLinks, getRoleLabel, getInitials } from "@/lib/navigation";
 import { Menu, LogOut, User } from "lucide-react";
 
-const getNavLinks = (role?: string) => {
-  const links: { href: string; label: string }[] = [{ href: ROUTES.DASHBOARD, label: "Dashboard" }];
-  
-  if (role === "admin") {
-    links.push({ href: ROUTES.EMPLOYEES, label: "Employees" });
-    links.push({ href: ROUTES.LEAVE_TYPES, label: "Leave Types" });
-    links.push({ href: ROUTES.SMTP_SETTINGS, label: "SMTP" });
-    links.push({ href: ROUTES.LEAVE, label: "All Leave Requests" });
-  } else if (role === "approval1" || role === "approval2") {
-    links.push({ href: ROUTES.LEAVE, label: "Approvals" });
-  } else {
-    links.push({ href: ROUTES.LEAVE, label: "My Leave" });
-  }
 
-  // Calendar accessible by admin, approval1, approval2
-  if (role === "admin" || role === "approval1" || role === "approval2") {
-    links.push({ href: ROUTES.CALENDAR, label: "Calendar" });
-  }
-  
-  return links;
-};
-
-function getRoleLabel(role?: string) {
-  switch (role) {
-    case "admin": return "Administrator";
-    case "approval1": return "Approval Level 1";
-    case "approval2": return "Approval Level 2";
-    case "user": return "Employee";
-    default: return "User";
-  }
-}
-
-function getInitials(username?: string) {
-  if (!username) return "U";
-  return username.slice(0, 2).toUpperCase();
-}
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { session, logout } = useAuth();
+  const { session, logout, isLoading, isAuthenticated } = useAuth();
 
+  // Hide on login, code-review, or when not authenticated
   if (([ROUTES.LOGIN, ROUTES.CODE_REVIEW] as string[]).includes(pathname)) {
+    return null;
+  }
+
+  if (isLoading || !isAuthenticated) {
     return null;
   }
 

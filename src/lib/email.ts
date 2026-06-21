@@ -53,8 +53,9 @@ export async function sendEmail(payload: EmailPayload): Promise<boolean> {
 
     console.log(`[Email] ✅ Sent to ${payload.to}: ${payload.subject} (messageId: ${info.messageId})`);
     return true;
-  } catch (error: any) {
-    console.error(`[Email] ❌ Failed to send email to ${payload.to}:`, error.message || error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[Email] ❌ Failed to send email to ${payload.to}:`, message);
     return false;
   }
 }

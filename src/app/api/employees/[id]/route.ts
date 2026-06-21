@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-
-const SALT_ROUNDS = 10;
+import { hashPassword } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
@@ -60,7 +58,7 @@ export async function PUT(
         ...(department !== undefined && { department }),
         ...(position !== undefined && { position }),
         ...(username !== undefined && { username: username || null }),
-        ...(password !== undefined && password !== "" && { password: await bcrypt.hash(password, SALT_ROUNDS) }),
+        ...(password !== undefined && password !== "" && { password: await hashPassword(password) }),
         ...(email !== undefined && { email: email || null }),
         ...(role !== undefined && { role }),
       },

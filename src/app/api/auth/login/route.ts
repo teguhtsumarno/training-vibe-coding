@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-
-const SALT_ROUNDS = 10;
-
-// Legacy hash for backward compatibility during migration
-function legacyHash(password: string): string {
-  if (!password) return password;
-  return typeof btoa === "function" ? btoa(password).split("").reverse().join("") : Buffer.from(password).toString("base64").split("").reverse().join("");
-}
+import { verifyPassword, hashPassword, isBcryptHash } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,20 +19,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Try bcrypt first, then legacy hash, then plaintext (for migration)
-    let isMatch = false;
-    const isBcryptHash = employee.password.startsWith("$2a$") || employee.password.startsWith("$2b$");
-
-    if (isBcryptHash) {
-      isMatch = await bcrypt.compare(password, employee.password);
-    } else {
-      // Legacy: check old Base64+Reverse hash or plaintext
-      isMatch = employee.password === legacyHash(password) || employee.password === password;
-    }
+    const isMatch = await verifyPassword(password, employee.password);
 
     if (isMatch) {
       // Migrate to bcrypt if not already using it
-      if (!isBcryptHash) {
-        const bcryptHash = await bcrypt.hash(password, SALT_ROUNDS);
+      if (!isBcryptHash(employee.password)) {
+        const bcryptHash = await hashPassword(password);
         await prisma.employee.update({
           where: { id: employee.id },
           data: { password: bcryptHash },

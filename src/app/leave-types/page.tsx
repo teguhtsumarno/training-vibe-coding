@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,20 +89,22 @@ export default function LeaveTypesPage() {
       }
       setDialogOpen(false);
       fetchLeaveTypes();
-    } catch (err: any) {
-      setError(err.message || "Gagal menyimpan data");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Gagal menyimpan data";
+      setError(message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (lt: LeaveType) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus jenis cuti "${lt.name}"?`)) return;
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus jenis cuti "${lt.name}"?`)) return;
     try {
       await deleteLeaveType(lt.id);
       fetchLeaveTypes();
-    } catch (err: any) {
-      alert(err.message || "Gagal menghapus jenis cuti");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Gagal menghapus jenis cuti";
+      toast.error(message);
     }
   };
 

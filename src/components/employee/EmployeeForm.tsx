@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/select";
 import { employeeSchema, type EmployeeFormValues } from "@/validators/employee-validator";
 import { ROUTES } from "@/constants";
-import { ArrowRight, User, Briefcase, Mail, Shield, KeyRound } from "lucide-react";
+import { ArrowRight, User, KeyRound } from "lucide-react";
+import { type Employee } from "@/types/employee";
 
 interface EmployeeFormProps {
   defaultValues?: EmployeeFormValues;
@@ -151,7 +152,7 @@ export default function EmployeeForm({ defaultValues, onSubmit, isEdit = false }
 
             <div className="space-y-1.5">
               <Label htmlFor="role" className="text-[14.5px] font-medium text-[#121317]">Role</Label>
-              <Select onValueChange={(value) => setValue("role", value as any)} defaultValue={defaultValues?.role}>
+              <Select onValueChange={(value) => setValue("role", value as Employee["role"])} defaultValue={defaultValues?.role}>
                 <SelectTrigger className="h-11 bg-white border-[#E1E6EC] rounded-lg text-[16px] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>

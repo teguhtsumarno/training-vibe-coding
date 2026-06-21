@@ -25,7 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { getAllEmployees } from "@/services/employee-storage";
-import { type LeaveRequest } from "@/types/leave";
+import { type LeaveRequest, type ApprovalHistory } from "@/types/leave";
 import { type Employee } from "@/types/employee";
 import { ROUTES } from "@/constants";
 
@@ -91,9 +91,10 @@ export default function LeavePage() {
         toast.success("Leave request rejected");
       }
       loadData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to process leave action:", error);
-      toast.error(error.message || "Failed to process leave request");
+      const message = error instanceof Error ? error.message : "Gagal memproses pengajuan cuti";
+      toast.error(message);
     } finally {
       setActionLoading(false);
       setActionDialog({ ...actionDialog, open: false });
@@ -116,7 +117,7 @@ export default function LeavePage() {
     open: boolean;
     requestId: string;
   }>({ open: false, requestId: "" });
-  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [historyData, setHistoryData] = useState<ApprovalHistory[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
   const handleViewHistory = async (id: string) => {

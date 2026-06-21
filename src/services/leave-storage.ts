@@ -1,4 +1,4 @@
-import { LeaveRequest, LeaveStatus } from "@/types/leave";
+import { ApprovalHistory, LeaveRequest } from "@/types/leave";
 import { getSession } from "./auth-storage";
 
 export async function getAllLeaveRequests(): Promise<LeaveRequest[]> {
@@ -23,17 +23,6 @@ export async function getLeaveRequestById(id: string): Promise<LeaveRequest | un
   }
 }
 
-export async function getLeaveRequestsByEmployeeId(
-  employeeId: string
-): Promise<LeaveRequest[]> {
-  try {
-    const requests = await getAllLeaveRequests();
-    return requests.filter((request) => request.employeeId === employeeId);
-  } catch (error) {
-    console.error(`Error fetching leave requests for employee ${employeeId}:`, error);
-    return [];
-  }
-}
 
 export async function createLeaveRequest(
   data: Omit<LeaveRequest, "id" | "status">
@@ -90,14 +79,6 @@ export async function rejectLeaveRequest(id: string, message?: string): Promise<
   return json.data;
 }
 
-export async function deleteLeaveRequestsByEmployeeId(employeeId: string): Promise<void> {
-  // Cascaded automatically in PostgreSQL via Prisma onDelete: Cascade on the foreign key relation
-}
-
-export async function getCountByStatus(status: LeaveStatus): Promise<number> {
-  const requests = await getAllLeaveRequests();
-  return requests.filter((request) => request.status === status).length;
-}
 
 export async function updateLeaveRequest(
   id: string,
@@ -127,7 +108,7 @@ export async function deleteLeaveRequest(id: string): Promise<void> {
   }
 }
 
-export async function getLeaveRequestHistory(id: string): Promise<any[]> {
+export async function getLeaveRequestHistory(id: string): Promise<ApprovalHistory[]> {
   try {
     const res = await fetch(`/api/leave-requests/${id}/history`);
     if (!res.ok) return [];

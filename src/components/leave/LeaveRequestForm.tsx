@@ -22,7 +22,8 @@ import { type Employee } from "@/types/employee";
 import { type LeaveType, type EmployeeLeaveBalance } from "@/types/leave";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants";
-import { ArrowRight, CalendarDays, FileText, Users, AlertTriangle } from "lucide-react";
+import { ArrowRight, CalendarDays, FileText, AlertTriangle } from "lucide-react";
+import { calculateDuration } from "@/lib/utils";
 
 interface LeaveRequestFormProps {
   onSubmit: (data: LeaveRequestFormValues) => void;
@@ -100,20 +101,12 @@ export default function LeaveRequestForm({ onSubmit, defaultValues, isEdit = fal
 
   const duration = useMemo(() => {
     if (!startDate || !endDate) return 0;
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const timeDiff = end.getTime() - start.getTime();
-    if (isNaN(timeDiff)) return 0;
-    const days = Math.round(timeDiff / (1000 * 3600 * 24)) + 1;
-    return days > 0 ? days : 0;
+    return calculateDuration(startDate, endDate);
   }, [startDate, endDate]);
 
   const oldDuration = useMemo(() => {
     if (!isEdit || !defaultValues?.startDate || !defaultValues?.endDate) return 0;
-    const start = new Date(defaultValues.startDate);
-    const end = new Date(defaultValues.endDate);
-    const days = Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
-    return days > 0 ? days : 0;
+    return calculateDuration(defaultValues.startDate, defaultValues.endDate);
   }, [isEdit, defaultValues]);
 
   const availableBalance = useMemo(() => {

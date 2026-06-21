@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-
-const SALT_ROUNDS = 10;
-
-async function hashPassword(password: string): Promise<string> {
-  if (!password) return password;
-  return bcrypt.hash(password, SALT_ROUNDS);
-}
+import { hashPassword } from "@/lib/auth";
 
 export async function GET() {
   try {

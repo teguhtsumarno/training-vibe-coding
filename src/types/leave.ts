@@ -25,3 +25,17 @@ export type EmployeeLeaveBalance = {
   balance: number;
   leaveType?: LeaveType;
 };
+
+export type ApprovalHistory = {
+  id: string;
+  leaveRequestId: string;
+  action: string;
+  actorId: string | null;
+  actorName: string;
+  message: string | null;
+  createdAt: string;
+};
+
+export type LeaveRequestWithRelations = LeaveRequest & {
+  leaveType?: { id: string; name: string } | null;
+};

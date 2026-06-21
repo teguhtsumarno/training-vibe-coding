@@ -14,9 +14,14 @@ export default function NewLeavePage() {
   const router = useRouter();
 
   const handleSubmit = async (data: LeaveRequestFormValues) => {
-    await createLeaveRequest(data);
-    toast.success("Leave request submitted successfully");
-    router.push(ROUTES.LEAVE);
+    try {
+      await createLeaveRequest(data);
+      toast.success("Leave request submitted successfully");
+      router.push(ROUTES.LEAVE);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Gagal membuat pengajuan cuti";
+      toast.error(message);
+    }
   };
 
   return (

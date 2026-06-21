@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildApprovalL1Email, buildFinalApprovalEmail, buildRejectionEmail } from "@/lib/email";
+import { calculateDuration } from "@/lib/utils";
 
 export async function PUT(
   req: NextRequest,
@@ -64,13 +65,8 @@ export async function PUT(
       let durationDiff = 0;
 
       if (startDate !== undefined || endDate !== undefined) {
-        const oldStart = new Date(existing.startDate);
-        const oldEnd = new Date(existing.endDate);
-        const oldDuration = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 3600 * 24)) + 1;
-
-        const newStart = new Date(newStartDate);
-        const newEnd = new Date(newEndDate);
-        const newDuration = Math.round((newEnd.getTime() - newStart.getTime()) / (1000 * 3600 * 24)) + 1;
+        const oldDuration = calculateDuration(existing.startDate, existing.endDate);
+        const newDuration = calculateDuration(newStartDate, newEndDate);
 
         durationDiff = newDuration - oldDuration;
       }
@@ -106,9 +102,7 @@ export async function PUT(
 
       // 4. Handle rejection refund (per leave type)
       if (status === "REJECTED" && existing.status !== "REJECTED" && targetLeaveTypeId) {
-        const start = new Date(existing.startDate);
-        const end = new Date(existing.endDate);
-        const currentDuration = Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+        const currentDuration = calculateDuration(existing.startDate, existing.endDate);
 
         await tx.employeeLeaveBalance.update({
           where: {
@@ -148,7 +142,7 @@ export async function PUT(
           leaveType: true,
         },
       });
-    }, { timeout: 15000 });
+    }, { isolationLevel: "Serializable", timeout: 15000 });
 
     // Fire-and-forget: send email notifications in background (non-blocking)
     if (status !== undefined && status !== existing.status) {
@@ -206,8 +200,9 @@ export async function PUT(
     }
 
     return NextResponse.json({ success: true, data: updated });
-  } catch (error: any) {
-    if (error.message === "INSUFFICIENT_BALANCE") {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Gagal memperbarui pengajuan cuti";
+    if (message === "INSUFFICIENT_BALANCE") {
       return NextResponse.json({ success: false, error: "Jatah cuti tidak mencukupi" }, { status: 400 });
     }
     console.error("PUT leave request API error:", error);
@@ -233,9 +228,7 @@ export async function DELETE(
     await prisma.$transaction(async (tx) => {
       // Refund balance if status was NOT REJECTED (per leave type)
       if (existing.status !== "REJECTED" && existing.leaveTypeId) {
-        const start = new Date(existing.startDate);
-        const end = new Date(existing.endDate);
-        const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
+        const duration = calculateDuration(existing.startDate, existing.endDate);
 
         await tx.employeeLeaveBalance.update({
           where: {
@@ -251,9 +244,9 @@ export async function DELETE(
       await tx.leaveRequest.delete({
         where: { id },
       });
-    });
+    }, { isolationLevel: "Serializable", timeout: 15000 });
 
-    return NextResponse.json({ success: true, message: "Leave request deleted successfully" });
+    return NextResponse.json({ success: true, message: "Pengajuan cuti berhasil dihapus" });
   } catch (error) {
     console.error("DELETE leave request API error:", error);
     return NextResponse.json({ success: false, error: "Gagal menghapus pengajuan cuti" }, { status: 500 });

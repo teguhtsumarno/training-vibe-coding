@@ -65,11 +65,3 @@ export async function deleteEmployee(id: string): Promise<void> {
     throw new Error(json.error || "Failed to delete employee");
   }
 }
-
-export async function searchEmployees(query: string): Promise<Employee[]> {
-  const employees = await getAllEmployees();
-  const lowerQuery = query.toLowerCase();
-  return employees.filter((employee) =>
-    employee.name.toLowerCase().includes(lowerQuery)
-  );
-}

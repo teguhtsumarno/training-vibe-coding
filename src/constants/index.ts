@@ -1,12 +1,5 @@
 export const STORAGE_KEYS = {
   AUTH_SESSION: "auth_session",
-  EMPLOYEES: "employees",
-  LEAVE_REQUESTS: "leave_requests",
-} as const;
-
-export const AUTH_CREDENTIALS = {
-  USERNAME: "admin",
-  PASSWORD: "admin123",
 } as const;
 
 export const ROUTES = {

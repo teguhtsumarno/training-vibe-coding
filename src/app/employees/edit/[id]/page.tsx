@@ -35,9 +35,14 @@ export default function EditEmployeePage() {
   }, [id, router]);
 
   const handleSubmit = async (data: EmployeeFormValues) => {
-    await updateEmployee(id, data);
-    toast.success("Employee updated successfully");
-    router.push(ROUTES.EMPLOYEES);
+    try {
+      await updateEmployee(id, data);
+      toast.success("Employee updated successfully");
+      router.push(ROUTES.EMPLOYEES);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Gagal memperbarui data karyawan";
+      toast.error(message);
+    }
   };
 
   if (isLoading) {
