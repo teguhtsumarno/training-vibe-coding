@@ -39,26 +39,26 @@ export async function PUT(req: NextRequest) {
       where: { id: "singleton" },
     });
 
+    // Determine password to save
+    let passwordToSave: string;
+    if (password && password !== "••••••••") {
+      passwordToSave = password;
+    } else if (existing) {
+      passwordToSave = existing.password;
+    } else {
+      passwordToSave = "";
+    }
+
     const dataToSave = {
       host,
       port: port !== undefined ? Number(port) : 587,
       secure: secure !== undefined ? Boolean(secure) : false,
       user,
+      password: passwordToSave,
       fromName: fromName || "Leave Management System",
       fromEmail,
       enabled: enabled === false ? false : true,
     };
-
-    console.log("[SMTP API] Saving settings - enabled:", enabled, "→", dataToSave.enabled);
-
-    // Only update password if it's provided and not the masked version
-    if (password && password !== "••••••••") {
-      dataToSave.password = password;
-    } else if (existing) {
-      dataToSave.password = existing.password;
-    } else {
-      dataToSave.password = "";
-    }
 
     const settings = await prisma.smtpSettings.upsert({
       where: { id: "singleton" },
