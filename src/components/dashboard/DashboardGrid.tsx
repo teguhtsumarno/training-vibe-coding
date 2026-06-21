@@ -29,18 +29,21 @@ export default function DashboardGrid() {
         const emps = await getAllEmployees();
         setTotalEmployees(emps.length);
         visibleRequests = allRequests;
+      } else if (session.role === "approval1") {
+        // Only show requests where this user is the assigned approval1
+        visibleRequests = allRequests.filter(req => req.approval1Id === session.employeeId);
+      } else if (session.role === "approval2") {
+        // Show requests that have passed L1 approval (assigned to this approval2)
+        visibleRequests = allRequests.filter(req =>
+          req.status === "PENDING_APPROVAL2" || req.status === "APPROVED" || req.status === "REJECTED"
+        );
       } else {
-        if (session.role === "approval1") {
-          visibleRequests = allRequests.filter(req => req.employeeId === session.employeeId || req.status === "PENDING_APPROVAL1");
-        } else if (session.role === "approval2") {
-          visibleRequests = allRequests.filter(req => req.employeeId === session.employeeId || req.status === "PENDING_APPROVAL2");
-        } else {
-          visibleRequests = allRequests.filter(req => req.employeeId === session.employeeId);
-        }
+        // Role "user" — only own requests
+        visibleRequests = allRequests.filter(req => req.employeeId === session.employeeId);
       }
 
-      // Fetch per-type leave balances
-      if (session.employeeId) {
+      // Fetch per-type leave balances only for role "user"
+      if (session.role === "user" && session.employeeId) {
         const balances = await getEmployeeLeaveBalances(session.employeeId);
         setLeaveBalances(balances);
       }
@@ -64,7 +67,7 @@ export default function DashboardGrid() {
           variant="blue"
         />
       )}
-      {leaveBalances.map((bal) => (
+      {session?.role === "user" && leaveBalances.map((bal) => (
         <DashboardCard
           key={bal.id}
           title={bal.leaveType?.name || "Leave Balance"}

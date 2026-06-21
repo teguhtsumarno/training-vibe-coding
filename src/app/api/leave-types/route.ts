@@ -39,11 +39,14 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // 2. Auto-assign balance to all existing employees
-      const allEmployees = await tx.employee.findMany({ select: { id: true } });
-      if (allEmployees.length > 0) {
+      // 2. Auto-assign balance to employees with role "user" only
+      const userEmployees = await tx.employee.findMany({
+        where: { role: "user" },
+        select: { id: true },
+      });
+      if (userEmployees.length > 0) {
         await tx.employeeLeaveBalance.createMany({
-          data: allEmployees.map((emp) => ({
+          data: userEmployees.map((emp) => ({
             employeeId: emp.id,
             leaveTypeId: created.id,
             balance: created.defaultBalance,

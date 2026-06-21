@@ -49,16 +49,18 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // 2. Auto-assign leave balances from all existing leave types
-      const leaveTypes = await tx.leaveType.findMany();
-      if (leaveTypes.length > 0) {
-        await tx.employeeLeaveBalance.createMany({
-          data: leaveTypes.map((lt) => ({
-            employeeId: emp.id,
-            leaveTypeId: lt.id,
-            balance: lt.defaultBalance,
-          })),
-        });
+      // 2. Auto-assign leave balances only for role "user"
+      if (role === "user") {
+        const leaveTypes = await tx.leaveType.findMany();
+        if (leaveTypes.length > 0) {
+          await tx.employeeLeaveBalance.createMany({
+            data: leaveTypes.map((lt) => ({
+              employeeId: emp.id,
+              leaveTypeId: lt.id,
+              balance: lt.defaultBalance,
+            })),
+          });
+        }
       }
 
       return emp;

@@ -56,17 +56,19 @@ export default function EmployeeTable({ employees, onDelete }: EmployeeTableProp
               <TableCell className="text-[#6A6A71] capitalize">{employee.role}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    asChild 
-                    className="h-8 w-8 rounded-lg hover:text-emerald-500 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 transition-all duration-300"
-                  >
-                    <Link href={`/employees/${employee.id}/balances`}>
-                      <Wallet className="h-3.5 w-3.5" />
-                      <span className="sr-only">Manage Balance</span>
-                    </Link>
-                  </Button>
+                  {employee.role === "user" && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      asChild 
+                      className="h-8 w-8 rounded-lg hover:text-emerald-500 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 transition-all duration-300"
+                    >
+                      <Link href={`/employees/${employee.id}/balances`}>
+                        <Wallet className="h-3.5 w-3.5" />
+                        <span className="sr-only">Manage Balance</span>
+                      </Link>
+                    </Button>
+                  )}
                   <Button 
                     variant="ghost" 
                     size="icon" 
