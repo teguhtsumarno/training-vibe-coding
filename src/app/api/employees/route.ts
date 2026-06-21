@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
-function hashPassword(password: string): string {
+const SALT_ROUNDS = 10;
+
+async function hashPassword(password: string): Promise<string> {
   if (!password) return password;
-  return typeof btoa === "function" ? btoa(password).split("").reverse().join("") : Buffer.from(password).toString("base64").split("").reverse().join("");
+  return bcrypt.hash(password, SALT_ROUNDS);
 }
 
 export async function GET() {
@@ -12,7 +15,7 @@ export async function GET() {
     return NextResponse.json({ success: true, data: employees });
   } catch (error) {
     console.error("GET employees API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch employees" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil data karyawan" }, { status: 500 });
   }
 }
 
@@ -22,7 +25,7 @@ export async function POST(req: NextRequest) {
     const { name, department, position, username, password, email, role } = body;
 
     if (!name || !department || !position || !role) {
-      return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Data yang diperlukan belum lengkap" }, { status: 400 });
     }
 
     // Check unique username if provided
@@ -31,7 +34,7 @@ export async function POST(req: NextRequest) {
         where: { username },
       });
       if (existing) {
-        return NextResponse.json({ success: false, error: "Username already exists" }, { status: 400 });
+        return NextResponse.json({ success: false, error: "Username sudah digunakan" }, { status: 400 });
       }
     }
 
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
           department,
           position,
           username: username || null,
-          password: password ? hashPassword(password) : null,
+          password: password ? await hashPassword(password) : null,
           email: email || null,
           role,
         },
@@ -69,6 +72,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, data: newEmployee }, { status: 201 });
   } catch (error) {
     console.error("POST employee API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to create employee" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal membuat data karyawan" }, { status: 500 });
   }
 }

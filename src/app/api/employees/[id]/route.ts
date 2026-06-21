@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
-function hashPassword(password: string): string {
-  if (!password) return password;
-  return typeof btoa === "function" ? btoa(password).split("").reverse().join("") : Buffer.from(password).toString("base64").split("").reverse().join("");
-}
+const SALT_ROUNDS = 10;
 
 export async function GET(
   req: NextRequest,
@@ -17,13 +15,13 @@ export async function GET(
     });
 
     if (!employee) {
-      return NextResponse.json({ success: false, error: "Employee not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Data karyawan tidak ditemukan" }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, data: employee });
   } catch (error) {
     console.error("GET employee by ID API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch employee" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil data karyawan" }, { status: 500 });
   }
 }
 
@@ -40,7 +38,7 @@ export async function PUT(
       where: { id },
     });
     if (!existing) {
-      return NextResponse.json({ success: false, error: "Employee not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Data karyawan tidak ditemukan" }, { status: 404 });
     }
 
     const { name, department, position, username, password, email, role } = body;
@@ -51,7 +49,7 @@ export async function PUT(
         where: { username },
       });
       if (uExists) {
-        return NextResponse.json({ success: false, error: "Username already exists" }, { status: 400 });
+        return NextResponse.json({ success: false, error: "Username sudah digunakan" }, { status: 400 });
       }
     }
 
@@ -62,7 +60,7 @@ export async function PUT(
         ...(department !== undefined && { department }),
         ...(position !== undefined && { position }),
         ...(username !== undefined && { username: username || null }),
-        ...(password !== undefined && password !== "" && { password: hashPassword(password) }),
+        ...(password !== undefined && password !== "" && { password: await bcrypt.hash(password, SALT_ROUNDS) }),
         ...(email !== undefined && { email: email || null }),
         ...(role !== undefined && { role }),
       },
@@ -71,7 +69,7 @@ export async function PUT(
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     console.error("PUT employee API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to update employee" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal memperbarui data karyawan" }, { status: 500 });
   }
 }
 
@@ -87,16 +85,16 @@ export async function DELETE(
       where: { id },
     });
     if (!existing) {
-      return NextResponse.json({ success: false, error: "Employee not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Data karyawan tidak ditemukan" }, { status: 404 });
     }
 
     await prisma.employee.delete({
       where: { id },
     });
 
-    return NextResponse.json({ success: true, message: "Employee deleted successfully" });
+    return NextResponse.json({ success: true, message: "Data karyawan berhasil dihapus" });
   } catch (error) {
     console.error("DELETE employee API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to delete employee" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal menghapus data karyawan" }, { status: 500 });
   }
 }

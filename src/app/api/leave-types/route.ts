@@ -10,7 +10,7 @@ export async function GET() {
     return NextResponse.json({ success: true, data: leaveTypes });
   } catch (error) {
     console.error("GET leave types API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch leave types" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil data jenis cuti" }, { status: 500 });
   }
 }
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const { name, defaultBalance, description } = body;
 
     if (!name) {
-      return NextResponse.json({ success: false, error: "Name is required" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Nama jenis cuti wajib diisi" }, { status: 400 });
     }
 
     // Check uniqueness
@@ -60,6 +60,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, data: leaveType }, { status: 201 });
   } catch (error) {
     console.error("POST leave type API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to create leave type" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal membuat jenis cuti" }, { status: 500 });
   }
 }

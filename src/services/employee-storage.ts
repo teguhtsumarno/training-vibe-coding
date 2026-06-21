@@ -1,10 +1,5 @@
 import { Employee } from "@/types/employee";
 
-export function hashPassword(password: string): string {
-  if (!password) return password;
-  return typeof btoa === "function" ? btoa(password).split("").reverse().join("") : Buffer.from(password).toString("base64").split("").reverse().join("");
-}
-
 export async function getAllEmployees(): Promise<Employee[]> {
   try {
     const res = await fetch("/api/employees");

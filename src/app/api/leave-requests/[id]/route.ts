@@ -12,7 +12,7 @@ export async function PUT(
     const { status, employeeId, approval1Id, leaveTypeId, startDate, endDate, reason, actorId, message } = body;
 
     if (!status && !employeeId && !approval1Id && !startDate && !endDate && !reason && !leaveTypeId) {
-      return NextResponse.json({ success: false, error: "No update fields provided" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Tidak ada data yang diperbarui" }, { status: 400 });
     }
 
     const existing = await prisma.leaveRequest.findUnique({
@@ -20,7 +20,7 @@ export async function PUT(
     });
 
     if (!existing) {
-      return NextResponse.json({ success: false, error: "Leave request not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Pengajuan cuti tidak ditemukan" }, { status: 404 });
     }
 
     // Determine the history action
@@ -150,72 +150,59 @@ export async function PUT(
       });
     }, { timeout: 15000 });
 
-    // Send email notifications based on status change
+    // Fire-and-forget: send email notifications in background (non-blocking)
     if (status !== undefined && status !== existing.status) {
-      try {
-        const leaveTypeName = updated.leaveType?.name || "Cuti";
-        console.log("[Email Debug] Status changed:", existing.status, "→", status);
+      (async () => {
+        try {
+          const leaveTypeName = updated.leaveType?.name || "Cuti";
+          console.log("[Email] Status changed:", existing.status, "→", status);
 
-        if (status === "PENDING_APPROVAL2") {
-          // L1 approved → notify all approval2 users
-          const approver1 = await prisma.employee.findUnique({ where: { id: existing.approval1Id } });
-          const approval2Users = await prisma.employee.findMany({ where: { role: "approval2" } });
-          console.log("[Email Debug] Found", approval2Users.length, "approval2 users");
-          const empData = await prisma.employee.findUnique({ where: { id: existing.employeeId } });
-          for (const a2 of approval2Users) {
-            if (a2.email) {
-              const emailData = buildApprovalL1Email({
-                employeeName: empData?.name || "Employee",
+          if (status === "PENDING_APPROVAL2") {
+            const approver1 = await prisma.employee.findUnique({ where: { id: existing.approval1Id } });
+            const approval2Users = await prisma.employee.findMany({ where: { role: "approval2" } });
+            const empData = await prisma.employee.findUnique({ where: { id: existing.employeeId } });
+            for (const a2 of approval2Users) {
+              if (a2.email) {
+                const emailData = buildApprovalL1Email({
+                  employeeName: empData?.name || "Karyawan",
+                  leaveTypeName,
+                  startDate: existing.startDate,
+                  endDate: existing.endDate,
+                  reason: existing.reason,
+                  approver1Name: approver1?.name || "Approval L1",
+                  approver2Name: a2.name,
+                });
+                sendEmail({ to: a2.email, ...emailData }).then(r => console.log("[Email] L1→L2 to", a2.email, ":", r));
+              }
+            }
+          } else if (status === "APPROVED") {
+            const employee = await prisma.employee.findUnique({ where: { id: existing.employeeId } });
+            if (employee?.email) {
+              const emailData = buildFinalApprovalEmail({
+                employeeName: employee.name,
                 leaveTypeName,
                 startDate: existing.startDate,
                 endDate: existing.endDate,
-                reason: existing.reason,
-                approver1Name: approver1?.name || "Approver L1",
-                approver2Name: a2.name,
               });
-              const result = await sendEmail({ to: a2.email, ...emailData });
-              console.log("[Email Debug] L1→L2 email to", a2.email, "result:", result);
-            } else {
-              console.log("[Email Debug] approval2 user", a2.name, "has no email, skipping");
+              sendEmail({ to: employee.email, ...emailData }).then(r => console.log("[Email] Approval to", employee.email, ":", r));
+            }
+          } else if (status === "REJECTED") {
+            const employee = await prisma.employee.findUnique({ where: { id: existing.employeeId } });
+            if (employee?.email) {
+              const emailData = buildRejectionEmail({
+                employeeName: employee.name,
+                leaveTypeName,
+                startDate: existing.startDate,
+                endDate: existing.endDate,
+                rejectorName: actorNameResolved,
+              });
+              sendEmail({ to: employee.email, ...emailData }).then(r => console.log("[Email] Rejection to", employee.email, ":", r));
             }
           }
-        } else if (status === "APPROVED") {
-          // L2 approved → notify employee
-          const employee = await prisma.employee.findUnique({ where: { id: existing.employeeId } });
-          console.log("[Email Debug] Employee:", employee?.name, "email:", employee?.email);
-          if (employee?.email) {
-            const emailData = buildFinalApprovalEmail({
-              employeeName: employee.name,
-              leaveTypeName,
-              startDate: existing.startDate,
-              endDate: existing.endDate,
-            });
-            const result = await sendEmail({ to: employee.email, ...emailData });
-            console.log("[Email Debug] Approval email to", employee.email, "result:", result);
-          } else {
-            console.log("[Email Debug] Employee has no email, skipping notification");
-          }
-        } else if (status === "REJECTED") {
-          // Rejected → notify employee
-          const employee = await prisma.employee.findUnique({ where: { id: existing.employeeId } });
-          console.log("[Email Debug] Employee:", employee?.name, "email:", employee?.email);
-          if (employee?.email) {
-            const emailData = buildRejectionEmail({
-              employeeName: employee.name,
-              leaveTypeName,
-              startDate: existing.startDate,
-              endDate: existing.endDate,
-              rejectorName: actorNameResolved,
-            });
-            const result = await sendEmail({ to: employee.email, ...emailData });
-            console.log("[Email Debug] Rejection email to", employee.email, "result:", result);
-          } else {
-            console.log("[Email Debug] Employee has no email, skipping notification");
-          }
+        } catch (emailError) {
+          console.error("[Email] Background send failed:", emailError);
         }
-      } catch (emailError) {
-        console.error("[Email Debug] Failed to send notification:", emailError);
-      }
+      })();
     }
 
     return NextResponse.json({ success: true, data: updated });
@@ -224,7 +211,7 @@ export async function PUT(
       return NextResponse.json({ success: false, error: "Jatah cuti tidak mencukupi" }, { status: 400 });
     }
     console.error("PUT leave request API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to update leave request" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal memperbarui pengajuan cuti" }, { status: 500 });
   }
 }
 
@@ -240,7 +227,7 @@ export async function DELETE(
     });
 
     if (!existing) {
-      return NextResponse.json({ success: false, error: "Leave request not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Pengajuan cuti tidak ditemukan" }, { status: 404 });
     }
 
     await prisma.$transaction(async (tx) => {
@@ -269,6 +256,6 @@ export async function DELETE(
     return NextResponse.json({ success: true, message: "Leave request deleted successfully" });
   } catch (error) {
     console.error("DELETE leave request API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to delete leave request" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal menghapus pengajuan cuti" }, { status: 500 });
   }
 }

@@ -21,7 +21,7 @@ export async function GET(
     return NextResponse.json({ success: true, data: balances });
   } catch (error) {
     console.error("GET employee leave balances API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch leave balances" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil data saldo cuti" }, { status: 500 });
   }
 }
 
@@ -35,7 +35,7 @@ export async function PUT(
     const { leaveTypeId, balance } = body;
 
     if (!leaveTypeId || balance === undefined) {
-      return NextResponse.json({ success: false, error: "leaveTypeId and balance are required" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Jenis cuti dan jumlah saldo wajib diisi" }, { status: 400 });
     }
 
     const updated = await prisma.employeeLeaveBalance.upsert({
@@ -61,6 +61,6 @@ export async function PUT(
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     console.error("PUT employee leave balance API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to update leave balance" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal memperbarui saldo cuti" }, { status: 500 });
   }
 }

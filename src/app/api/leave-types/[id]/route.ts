@@ -10,13 +10,13 @@ export async function GET(
     const leaveType = await prisma.leaveType.findUnique({ where: { id } });
 
     if (!leaveType) {
-      return NextResponse.json({ success: false, error: "Leave type not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Jenis cuti tidak ditemukan" }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, data: leaveType });
   } catch (error) {
     console.error("GET leave type by ID API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch leave type" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil data jenis cuti" }, { status: 500 });
   }
 }
 
@@ -31,7 +31,7 @@ export async function PUT(
 
     const existing = await prisma.leaveType.findUnique({ where: { id } });
     if (!existing) {
-      return NextResponse.json({ success: false, error: "Leave type not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Jenis cuti tidak ditemukan" }, { status: 404 });
     }
 
     // Check name uniqueness if name is being changed
@@ -54,7 +54,7 @@ export async function PUT(
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     console.error("PUT leave type API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to update leave type" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal memperbarui jenis cuti" }, { status: 500 });
   }
 }
 
@@ -67,7 +67,7 @@ export async function DELETE(
 
     const existing = await prisma.leaveType.findUnique({ where: { id } });
     if (!existing) {
-      return NextResponse.json({ success: false, error: "Leave type not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Jenis cuti tidak ditemukan" }, { status: 404 });
     }
 
     // Check if any leave requests reference this type
@@ -88,6 +88,6 @@ export async function DELETE(
     return NextResponse.json({ success: true, message: "Leave type deleted successfully" });
   } catch (error) {
     console.error("DELETE leave type API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to delete leave type" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal menghapus jenis cuti" }, { status: 500 });
   }
 }

@@ -12,7 +12,7 @@ export async function GET() {
     return NextResponse.json({ success: true, data: requests });
   } catch (error) {
     console.error("GET leave requests API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to fetch leave requests" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal mengambil data pengajuan cuti" }, { status: 500 });
   }
 }
 
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const { employeeId, approval1Id, leaveTypeId, startDate, endDate, reason } = body;
 
     if (!employeeId || !approval1Id || !leaveTypeId || !startDate || !endDate || !reason) {
-      return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Data yang diperlukan belum lengkap" }, { status: 400 });
     }
 
     const employee = await prisma.employee.findUnique({
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!employee) {
-      return NextResponse.json({ success: false, error: "Employee not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: "Data karyawan tidak ditemukan" }, { status: 404 });
     }
 
     // Verify leave type exists
@@ -113,31 +113,29 @@ export async function POST(req: NextRequest) {
       return reqCreated;
     });
 
-    // 3. Send email notification to Approval L1
-    try {
-      const approver = await prisma.employee.findUnique({ where: { id: approval1Id } });
-      console.log("[Email Debug] Approver found:", approver?.name, "email:", approver?.email);
-      if (approver?.email) {
-        const emailData = buildLeaveCreatedEmail({
-          employeeName: employee.name,
-          leaveTypeName: leaveType.name,
-          startDate,
-          endDate,
-          reason,
-          approverName: approver.name,
-        });
-        const result = await sendEmail({ to: approver.email, ...emailData });
-        console.log("[Email Debug] Send result:", result);
-      } else {
-        console.log("[Email Debug] No email found for approver, skipping notification");
+    // Fire-and-forget: send email notification to Approval L1 in background
+    (async () => {
+      try {
+        const approver = await prisma.employee.findUnique({ where: { id: approval1Id } });
+        if (approver?.email) {
+          const emailData = buildLeaveCreatedEmail({
+            employeeName: employee.name,
+            leaveTypeName: leaveType.name,
+            startDate,
+            endDate,
+            reason,
+            approverName: approver.name,
+          });
+          sendEmail({ to: approver.email, ...emailData }).then(r => console.log("[Email] Notification to L1:", r));
+        }
+      } catch (emailError) {
+        console.error("[Email] Background send failed:", emailError);
       }
-    } catch (emailError) {
-      console.error("[Email Debug] Failed to send notification:", emailError);
-    }
+    })();
 
     return NextResponse.json({ success: true, data: newRequest }, { status: 201 });
   } catch (error) {
     console.error("POST leave request API error:", error);
-    return NextResponse.json({ success: false, error: "Failed to create leave request" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Gagal membuat pengajuan cuti" }, { status: 500 });
   }
 }
