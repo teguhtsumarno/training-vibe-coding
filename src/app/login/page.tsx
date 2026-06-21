@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginSchema, type LoginFormValues } from "@/validators/login-validator";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants";
+import { ArrowRight, KeyRound } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,60 +46,102 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[85vh] -mt-14 md:-mt-8 px-4">
-      <Card className="w-full max-w-md bg-[#09090b] border border-white/5 rounded-2xl shadow-2xl shadow-blue-500/5 overflow-hidden relative">
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-500 via-purple-500 to-blue-500" />
-        <CardHeader className="text-center pt-8 pb-4">
-          <CardTitle className="text-3xl font-heading font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
-            LeaveManager
-          </CardTitle>
-          <CardDescription className="text-muted-foreground text-xs mt-1.5 font-medium">
-            Enter your admin credentials to access the system
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pb-8">
+    <div className="flex items-center justify-center min-h-screen bg-white -mt-14 md:-mt-8 px-4">
+      {/* Subtle background pattern */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[400px] -right-[300px] w-[800px] h-[800px] rounded-full bg-[rgba(50,121,249,0.03)]" />
+        <div className="absolute -bottom-[300px] -left-[200px] w-[600px] h-[600px] rounded-full bg-[rgba(239,242,247,0.8)]" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-[420px]">
+        {/* Logo & Branding */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#121317] mb-5">
+            <KeyRound className="w-6 h-6 text-white" />
+          </div>
+          <h1 className="text-[28px] font-heading font-medium text-[#121317] tracking-tight">
+            Welcome back
+          </h1>
+          <p className="text-[14.5px] text-[#6A6A71] mt-2">
+            Sign in to your account to continue
+          </p>
+        </div>
+
+        {/* Login Card */}
+        <div className="bg-white border border-[#E1E6EC] rounded-[16px] p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Username Field */}
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-sm font-semibold text-white tracking-wide">Username</Label>
+              <Label htmlFor="username" className="text-[14.5px] font-medium text-[#121317]">
+                Username
+              </Label>
               <Input
                 id="username"
-                placeholder="Enter username"
+                placeholder="Enter your username"
                 {...register("username")}
-                className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                className="h-11 bg-white border-[#E1E6EC] rounded-lg px-3.5 text-[16px] placeholder:text-[#AAB1CC] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200"
               />
               {errors.username && (
-                <p className="text-xs font-medium text-red-500">{errors.username.message}</p>
+                <p className="text-[14.5px] text-[#FF0000]">{errors.username.message}</p>
               )}
             </div>
 
+            {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold text-white tracking-wide">Password</Label>
+              <Label htmlFor="password" className="text-[14.5px] font-medium text-[#121317]">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter password"
+                placeholder="Enter your password"
                 {...register("password")}
-                className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                className="h-11 bg-white border-[#E1E6EC] rounded-lg px-3.5 text-[16px] placeholder:text-[#AAB1CC] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200"
               />
               {errors.password && (
-                <p className="text-xs font-medium text-red-500">{errors.password.message}</p>
+                <p className="text-[14.5px] text-[#FF0000]">{errors.password.message}</p>
               )}
             </div>
 
+            {/* Error Message */}
             {error && (
-              <p className="text-xs font-medium text-red-500 text-center">{error}</p>
+              <div className="flex items-center gap-2 rounded-lg border border-[#FF0000] bg-[rgba(255,0,0,0.02)] px-4 py-3">
+                <div className="h-1.5 w-1.5 rounded-full bg-[#FF0000] shrink-0" />
+                <p className="text-[14.5px] text-[#FF0000]">{error}</p>
+              </div>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-red-500/20 py-2.5 font-semibold transition-all duration-300 border-0 mt-2 cursor-pointer" 
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              variant="cta"
+              size="lg"
+              className="w-full h-11 mt-1 cursor-pointer group"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Logging in..." : "Login"}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  Sign in
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                </span>
+              )}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-[14.5px] text-[#6A6A71] mt-8">
+          Employee Leave Management System
+        </p>
+      </div>
     </div>
   );
 }

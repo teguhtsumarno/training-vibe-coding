@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -138,16 +138,16 @@ export default function SmtpSettingsPage() {
         <div className="max-w-2xl mx-auto space-y-8">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
+            <h1 className="text-3xl font-heading font-medium tracking-tight text-[#121317]">
               Pengaturan SMTP
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-[#6A6A71] mt-1">
               Konfigurasi server email untuk notifikasi pengajuan cuti
             </p>
           </div>
 
           {loading ? (
-            <div className="text-center py-16 text-muted-foreground">Loading...</div>
+            <div className="text-center py-16 text-[#6A6A71]">Loading...</div>
           ) : (
             <div className="space-y-6">
               {/* Status Card */}
@@ -166,13 +166,13 @@ export default function SmtpSettingsPage() {
                       <Mail className={`h-5 w-5 ${hasExisting && form.enabled ? "text-emerald-400" : "text-amber-400"}`} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white text-sm">
+                      <h3 className="font-semibold text-[#121317] text-sm">
                         {hasExisting
                           ? form.enabled ? "Notifikasi Email Aktif" : "Notifikasi Email Nonaktif"
                           : "Belum Dikonfigurasi"
                         }
                       </h3>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-[#6A6A71]">
                         {hasExisting
                           ? form.enabled ? `Server: ${form.host}:${form.port}` : "Notifikasi email dinonaktifkan"
                           : "Isi konfigurasi di bawah untuk mengaktifkan notifikasi email"
@@ -181,7 +181,7 @@ export default function SmtpSettingsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{form.enabled ? "ON" : "OFF"}</span>
+                    <span className="text-xs text-[#6A6A71]">{form.enabled ? "ON" : "OFF"}</span>
                     <Switch
                       checked={form.enabled}
                       onCheckedChange={(checked) => updateField("enabled", checked)}
@@ -191,38 +191,38 @@ export default function SmtpSettingsPage() {
               </div>
 
               {/* SMTP Configuration Form */}
-              <div className="bg-[#09090b] border border-white/5 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-blue-500/5 space-y-6">
+              <div className="bg-white border border-[#E1E6EC] rounded-2xl p-6 sm:p-8  space-y-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Server className="h-4 w-4 text-blue-400" />
-                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Server SMTP</h2>
+                  <h2 className="font-heading font-bold text-[#121317] text-base tracking-wide">Server SMTP</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="sm:col-span-2 space-y-2">
-                    <Label className="text-sm font-semibold text-white tracking-wide">SMTP Host</Label>
+                    <Label className="text-sm font-semibold text-[#121317] tracking-wide">SMTP Host</Label>
                     <Input
                       value={form.host}
                       onChange={(e) => updateField("host", e.target.value)}
                       placeholder="smtp.gmail.com"
-                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                      className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-white tracking-wide">Port</Label>
+                    <Label className="text-sm font-semibold text-[#121317] tracking-wide">Port</Label>
                     <Input
                       type="number"
                       value={form.port}
                       onChange={(e) => updateField("port", Number(e.target.value))}
                       placeholder="587"
-                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                      className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[#F8F9FC] border border-[#E1E6EC]">
                   <div>
-                    <span className="text-sm font-semibold text-white">SSL/TLS (Secure)</span>
-                    <p className="text-xs text-muted-foreground">Aktifkan untuk port 465</p>
+                    <span className="text-sm font-semibold text-[#121317]">SSL/TLS (Secure)</span>
+                    <p className="text-xs text-[#6A6A71]">Aktifkan untuk port 465</p>
                   </div>
                   <Switch
                     checked={form.secure}
@@ -230,37 +230,37 @@ export default function SmtpSettingsPage() {
                   />
                 </div>
 
-                <hr className="border-white/5" />
+                <hr className="border-[#E1E6EC]" />
                 
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="h-4 w-4 text-purple-400" />
-                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Autentikasi</h2>
+                  <h2 className="font-heading font-bold text-[#121317] text-base tracking-wide">Autentikasi</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-white tracking-wide">Username / Email</Label>
+                    <Label className="text-sm font-semibold text-[#121317] tracking-wide">Username / Email</Label>
                     <Input
                       value={form.user}
                       onChange={(e) => updateField("user", e.target.value)}
                       placeholder="user@example.com"
-                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                      className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-white tracking-wide">Password / App Password</Label>
+                    <Label className="text-sm font-semibold text-[#121317] tracking-wide">Password / App Password</Label>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
                         value={form.password}
                         onChange={(e) => updateField("password", e.target.value)}
                         placeholder="••••••••"
-                        className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300 pr-10"
+                        className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300 pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6A6A71] hover:text-[#121317] transition-colors"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -268,39 +268,39 @@ export default function SmtpSettingsPage() {
                   </div>
                 </div>
 
-                <hr className="border-white/5" />
+                <hr className="border-[#E1E6EC]" />
                 
                 <div className="flex items-center gap-2 mb-2">
                   <Mail className="h-4 w-4 text-red-400" />
-                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Pengirim</h2>
+                  <h2 className="font-heading font-bold text-[#121317] text-base tracking-wide">Pengirim</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-white tracking-wide">Nama Pengirim</Label>
+                    <Label className="text-sm font-semibold text-[#121317] tracking-wide">Nama Pengirim</Label>
                     <Input
                       value={form.fromName}
                       onChange={(e) => updateField("fromName", e.target.value)}
                       placeholder="Leave Management System"
-                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                      className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-white tracking-wide">Email Pengirim</Label>
+                    <Label className="text-sm font-semibold text-[#121317] tracking-wide">Email Pengirim</Label>
                     <Input
                       value={form.fromEmail}
                       onChange={(e) => updateField("fromEmail", e.target.value)}
                       placeholder="noreply@company.com"
-                      className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                      className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                <div className="flex items-center gap-3 pt-4 border-t border-[#E1E6EC]">
                   <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex-1 bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-red-500/20 py-2.5 font-semibold transition-all duration-300 border-0"
+                    variant="cta" className="flex-1"
                   >
                     {saving ? "Menyimpan..." : "Simpan Pengaturan"}
                   </Button>
@@ -308,22 +308,22 @@ export default function SmtpSettingsPage() {
               </div>
 
               {/* Test Email Section */}
-              <div className="bg-[#09090b] border border-white/5 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-blue-500/5 space-y-4">
+              <div className="bg-white border border-[#E1E6EC] rounded-2xl p-6 sm:p-8  space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Send className="h-4 w-4 text-emerald-400" />
-                  <h2 className="font-heading font-bold text-white text-base tracking-wide">Test Koneksi SMTP</h2>
+                  <h2 className="font-heading font-bold text-[#121317] text-base tracking-wide">Test Koneksi SMTP</h2>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-[#6A6A71]">
                   Kirim email test untuk memastikan konfigurasi SMTP sudah benar.
                 </p>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-white tracking-wide">Email Tujuan Test</Label>
+                  <Label className="text-sm font-semibold text-[#121317] tracking-wide">Email Tujuan Test</Label>
                   <Input
                     value={testEmail}
                     onChange={(e) => setTestEmail(e.target.value)}
                     placeholder="your-email@example.com"
-                    className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
+                    className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300"
                   />
                 </div>
 
@@ -339,27 +339,27 @@ export default function SmtpSettingsPage() {
               </div>
 
               {/* Info Card */}
-              <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-5 space-y-3">
+              <div className="bg-blue-500/5 border border-[#E1E6EC] rounded-2xl p-5 space-y-3">
                 <h3 className="font-heading font-bold text-blue-400 text-sm">📧 Kapan email dikirim?</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
+                <ul className="space-y-2 text-sm text-[#6A6A71]">
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-0.5">1.</span>
-                    <span><strong className="text-white">Employee mengajukan cuti</strong> → Notifikasi ke Approval L1</span>
+                    <span><strong className="text-[#121317]">Employee mengajukan cuti</strong> → Notifikasi ke Approval L1</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-0.5">2.</span>
-                    <span><strong className="text-white">Approval L1 menyetujui</strong> → Notifikasi ke Approval L2</span>
+                    <span><strong className="text-[#121317]">Approval L1 menyetujui</strong> → Notifikasi ke Approval L2</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-0.5">3.</span>
-                    <span><strong className="text-white">Approval L2 menyetujui</strong> → Notifikasi ke Employee (cuti disetujui)</span>
+                    <span><strong className="text-[#121317]">Approval L2 menyetujui</strong> → Notifikasi ke Employee (cuti disetujui)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-red-400 mt-0.5">4.</span>
-                    <span><strong className="text-white">Cuti ditolak</strong> → Notifikasi ke Employee (cuti ditolak)</span>
+                    <span><strong className="text-[#121317]">Cuti ditolak</strong> → Notifikasi ke Employee (cuti ditolak)</span>
                   </li>
                 </ul>
-                <p className="text-xs text-muted-foreground/60 mt-2">
+                <p className="text-xs text-[#6A6A71]/60 mt-2">
                   💡 Email notifikasi dikirim ke field <strong>email</strong> pada data employee. Pastikan field email sudah terisi dengan alamat email yang valid.
                 </p>
               </div>

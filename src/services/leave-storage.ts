@@ -51,7 +51,7 @@ export async function createLeaveRequest(
   return json.data;
 }
 
-export async function approveLeaveRequest(id: string, actionRole: string): Promise<LeaveRequest> {
+export async function approveLeaveRequest(id: string, actionRole: string, message?: string): Promise<LeaveRequest> {
   const session = getSession();
   const nextStatus = actionRole === "approval1" ? "PENDING_APPROVAL2" : "APPROVED";
   const res = await fetch(`/api/leave-requests/${id}`, {
@@ -60,6 +60,7 @@ export async function approveLeaveRequest(id: string, actionRole: string): Promi
     body: JSON.stringify({
       status: nextStatus,
       actorId: session?.employeeId,
+      message: message || null,
     }),
   });
   
@@ -70,7 +71,7 @@ export async function approveLeaveRequest(id: string, actionRole: string): Promi
   return json.data;
 }
 
-export async function rejectLeaveRequest(id: string): Promise<LeaveRequest> {
+export async function rejectLeaveRequest(id: string, message?: string): Promise<LeaveRequest> {
   const session = getSession();
   const res = await fetch(`/api/leave-requests/${id}`, {
     method: "PUT",
@@ -78,6 +79,7 @@ export async function rejectLeaveRequest(id: string): Promise<LeaveRequest> {
     body: JSON.stringify({
       status: "REJECTED",
       actorId: session?.employeeId,
+      message: message || null,
     }),
   });
   

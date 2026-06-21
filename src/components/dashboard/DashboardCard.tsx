@@ -21,36 +21,25 @@ export default function DashboardCard({
 
   return (
     <Card 
-      className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-1 bg-[#09090b] border-white/5 ${
-        isRed 
-          ? "hover:border-red-500/30 hover:shadow-red-glow" 
-          : "hover:border-blue-500/30 hover:shadow-blue-glow"
-      } ${className}`}
+      className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-1 bg-white border border-[#E1E6EC] rounded-[16px] shadow-none ${className}`}
     >
-      {/* Sleek top indicator gradient */}
-      <div 
-        className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${
-          isRed ? "from-red-500 to-purple-600" : "from-blue-500 to-purple-600"
-        }`} 
-      />
-      
       <CardHeader className="flex flex-row items-center justify-between pb-2 pt-6">
-        <CardTitle className="text-sm font-heading font-medium text-muted-foreground">{title}</CardTitle>
+        <CardTitle className="text-sm font-heading font-medium text-[#6A6A71]">{title}</CardTitle>
         <div 
           className={`p-2 rounded-xl transition-all duration-300 ${
             isRed 
-              ? "bg-red-500/10 text-red-400 border border-red-500/20" 
-              : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+              ? "bg-red-50 text-red-500 border border-red-200" 
+              : "bg-blue-50 text-blue-500 border border-blue-200"
           }`}
         >
           {icon}
         </div>
       </CardHeader>
       <CardContent className="pb-6">
-        <div className="text-4xl font-heading font-extrabold text-white tracking-tight">
+        <div className="text-4xl font-heading font-medium text-[#121317] tracking-tight">
           {value}
         </div>
-        <p className="text-xs text-muted-foreground mt-1.5 font-medium">{description}</p>
+        <p className="text-xs text-[#6A6A71] mt-1.5 font-medium">{description}</p>
       </CardContent>
     </Card>
   );

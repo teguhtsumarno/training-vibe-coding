@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Sidebar from "@/components/shared/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ["latin"],
+  weight: ["400", "500"],
   variable: "--font-sans",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const interHeading = Inter({
   subsets: ["latin"],
+  weight: ["500"],
   variable: "--font-heading",
 });
 
@@ -27,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${plusJakartaSans.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
+    <html lang="en">
+      <body className={`${inter.variable} ${interHeading.variable} font-sans antialiased`}>
         <AuthProvider>
           <Navbar />
           <Sidebar />
@@ -41,4 +43,3 @@ export default function RootLayout({
     </html>
   );
 }
-

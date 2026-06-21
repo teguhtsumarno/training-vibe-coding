@@ -20,6 +20,7 @@ export default function EmployeesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const loadEmployees = async () => {
     const data = await getAllEmployees();
@@ -43,10 +44,18 @@ export default function EmployeesPage() {
 
   const handleDeleteConfirm = async () => {
     if (deleteTarget) {
-      await deleteEmployee(deleteTarget.id);
-      await deleteLeaveRequestsByEmployeeId(deleteTarget.id);
-      toast.success(`Employee "${deleteTarget.name}" deleted successfully`);
-      loadEmployees();
+      setDeleteLoading(true);
+      try {
+        await deleteEmployee(deleteTarget.id);
+        await deleteLeaveRequestsByEmployeeId(deleteTarget.id);
+        toast.success(`Employee "${deleteTarget.name}" deleted successfully`);
+        loadEmployees();
+      } catch (error) {
+        console.error("Failed to delete employee:", error);
+        toast.error("Failed to delete employee");
+      } finally {
+        setDeleteLoading(false);
+      }
     }
     setDeleteDialogOpen(false);
     setDeleteTarget(null);
@@ -58,7 +67,7 @@ export default function EmployeesPage() {
         title="Employees"
         description="Manage your employee records"
         action={
-          <Button asChild className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-red-500/20 px-5 font-semibold transition-all duration-300 border-0 cursor-pointer">
+          <Button asChild variant="cta" className="px-5 cursor-pointer">
             <Link href={ROUTES.EMPLOYEES_NEW}>
               <Plus className="h-4 w-4 mr-2" />
               Add Employee
@@ -73,6 +82,7 @@ export default function EmployeesPage() {
       <EmployeeDeleteDialog
         employee={deleteTarget}
         open={deleteDialogOpen}
+        loading={deleteLoading}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
       />

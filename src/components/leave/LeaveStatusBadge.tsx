@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { type LeaveStatus } from "@/types/leave";
 
 interface LeaveStatusBadgeProps {
@@ -8,7 +8,7 @@ interface LeaveStatusBadgeProps {
 const statusConfig: Record<LeaveStatus, { label: string; className: string }> = {
   PENDING_APPROVAL1: {
     label: "Pending L1",
-    className: "border-white/10 text-muted-foreground bg-transparent hover:bg-transparent rounded-full px-2.5 py-0.5 text-xs font-medium",
+    className: "border-[#E1E6EC] text-[#6A6A71] bg-transparent hover:bg-transparent rounded-full px-2.5 py-0.5 text-xs font-medium",
   },
   PENDING_APPROVAL2: {
     label: "Pending L2",
@@ -27,7 +27,7 @@ const statusConfig: Record<LeaveStatus, { label: string; className: string }> = 
 export default function LeaveStatusBadge({ status }: LeaveStatusBadgeProps) {
   const config = statusConfig[status as LeaveStatus] || {
     label: status || "Unknown",
-    className: "border-white/10 text-muted-foreground bg-transparent hover:bg-transparent rounded-full px-2.5 py-0.5 text-xs font-medium",
+    className: "border-[#E1E6EC] text-[#6A6A71] bg-transparent hover:bg-transparent rounded-full px-2.5 py-0.5 text-xs font-medium",
   };
   return (
     <Badge variant="outline" className={config.className}>

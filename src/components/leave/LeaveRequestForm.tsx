@@ -22,6 +22,7 @@ import { type Employee } from "@/types/employee";
 import { type LeaveType, type EmployeeLeaveBalance } from "@/types/leave";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants";
+import { ArrowRight, CalendarDays, FileText, Users, AlertTriangle } from "lucide-react";
 
 interface LeaveRequestFormProps {
   onSubmit: (data: LeaveRequestFormValues) => void;
@@ -56,7 +57,6 @@ export default function LeaveRequestForm({ onSubmit, defaultValues, isEdit = fal
   const startDate = watch("startDate");
   const endDate = watch("endDate");
 
-  // Fetch all employees/approvers + leave types on mount
   useEffect(() => {
     const fetchData = async () => {
       const [allEmps, allLeaveTypes] = await Promise.all([
@@ -74,14 +74,12 @@ export default function LeaveRequestForm({ onSubmit, defaultValues, isEdit = fal
     fetchData();
   }, [isAdmin, session, setValue]);
 
-  // Load default form values if editing
   useEffect(() => {
     if (defaultValues) {
       reset(defaultValues);
     }
   }, [defaultValues, reset]);
 
-  // Fetch the selected employee's per-type balances
   useEffect(() => {
     if (!selectedEmployeeId) {
       setEmployeeBalances([]);
@@ -94,14 +92,12 @@ export default function LeaveRequestForm({ onSubmit, defaultValues, isEdit = fal
     fetchBalances();
   }, [selectedEmployeeId]);
 
-  // Get the balance for the selected leave type
   const selectedBalance = useMemo(() => {
     if (!selectedLeaveTypeId || employeeBalances.length === 0) return null;
     const found = employeeBalances.find((b) => b.leaveTypeId === selectedLeaveTypeId);
     return found ? found.balance : 0;
   }, [selectedLeaveTypeId, employeeBalances]);
 
-  // Calculate current request duration
   const duration = useMemo(() => {
     if (!startDate || !endDate) return 0;
     const start = new Date(startDate);
@@ -112,7 +108,6 @@ export default function LeaveRequestForm({ onSubmit, defaultValues, isEdit = fal
     return days > 0 ? days : 0;
   }, [startDate, endDate]);
 
-  // Calculate old duration if editing (so we can refund it locally for balance comparison)
   const oldDuration = useMemo(() => {
     if (!isEdit || !defaultValues?.startDate || !defaultValues?.endDate) return 0;
     const start = new Date(defaultValues.startDate);
@@ -121,7 +116,6 @@ export default function LeaveRequestForm({ onSubmit, defaultValues, isEdit = fal
     return days > 0 ? days : 0;
   }, [isEdit, defaultValues]);
 
-  // Calculate effective available balance for this form (handles edits correctly)
   const availableBalance = useMemo(() => {
     if (selectedBalance === null) return null;
     return isEdit ? selectedBalance + oldDuration : selectedBalance;
@@ -129,181 +123,238 @@ export default function LeaveRequestForm({ onSubmit, defaultValues, isEdit = fal
 
   const isBalanceInsufficient = availableBalance !== null && duration > availableBalance;
 
-  // Get the selected leave type name
   const selectedLeaveTypeName = useMemo(() => {
     if (!selectedLeaveTypeId) return "";
     const found = leaveTypes.find((lt) => lt.id === selectedLeaveTypeId);
     return found ? found.name : "";
   }, [selectedLeaveTypeId, leaveTypes]);
 
+  const selectTriggerClasses = "h-11 bg-white border-[#E1E6EC] rounded-lg text-[16px] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200";
+  const inputClasses = "h-11 bg-white border-[#E1E6EC] rounded-lg px-3.5 text-[16px] text-[#121317] placeholder:text-[#AAB1CC] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200";
+
   return (
-    <div className="bg-[#09090b] border border-white/5 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl shadow-blue-500/5">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {isAdmin && (
-          <div className="space-y-2">
-            <Label htmlFor="employeeId" className="text-sm font-semibold text-white tracking-wide">Employee</Label>
-            <Select 
-              value={watch("employeeId")} 
-              onValueChange={(value) => setValue("employeeId", value as string)}
-            >
-              <SelectTrigger className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300">
-                <SelectValue placeholder="Select an employee">
-                  {watch("employeeId") ? employees.find(emp => emp.id === watch("employeeId"))?.name : undefined}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-[#09090b] border border-white/5 rounded-xl">
-                {employees.map((emp) => (
-                  <SelectItem key={emp.id} value={emp.id} className="focus:bg-blue-500/10 focus:text-white cursor-pointer">
-                    {emp.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.employeeId && (
-              <p className="text-xs font-medium text-red-500">{errors.employeeId.message}</p>
-            )}
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <Label htmlFor="leaveTypeId" className="text-sm font-semibold text-white tracking-wide">Jenis Cuti</Label>
-          <Select 
-            value={watch("leaveTypeId")} 
-            onValueChange={(value) => setValue("leaveTypeId", value as string)}
-          >
-            <SelectTrigger className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300">
-              <SelectValue placeholder="Pilih jenis cuti">
-                {watch("leaveTypeId") ? leaveTypes.find(lt => lt.id === watch("leaveTypeId"))?.name : undefined}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className="bg-[#09090b] border border-white/5 rounded-xl">
-              {leaveTypes.map((lt) => {
-                const balance = employeeBalances.find((b) => b.leaveTypeId === lt.id);
-                return (
-                  <SelectItem key={lt.id} value={lt.id} className="focus:bg-blue-500/10 focus:text-white cursor-pointer">
-                    {lt.name} {balance ? `(Sisa: ${balance.balance} hari)` : ""}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-          {errors.leaveTypeId && (
-            <p className="text-xs font-medium text-red-500">{errors.leaveTypeId.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="approval1Id" className="text-sm font-semibold text-white tracking-wide">Approval L1</Label>
-          <Select 
-            value={watch("approval1Id")} 
-            onValueChange={(value) => setValue("approval1Id", value as string)}
-          >
-            <SelectTrigger className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300">
-              <SelectValue placeholder="Select Approval L1">
-                {watch("approval1Id") ? approvers.find(emp => emp.id === watch("approval1Id"))?.name : undefined}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className="bg-[#09090b] border border-white/5 rounded-xl">
-              {approvers.map((emp) => (
-                <SelectItem key={emp.id} value={emp.id} className="focus:bg-blue-500/10 focus:text-white cursor-pointer">
-                  {emp.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.approval1Id && (
-            <p className="text-xs font-medium text-red-500">{errors.approval1Id.message}</p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="startDate" className="text-sm font-semibold text-white tracking-wide">Start Date</Label>
-            <Input 
-              id="startDate" 
-              type="date" 
-              {...register("startDate")} 
-              className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-            />
-            {errors.startDate && (
-              <p className="text-xs font-medium text-red-500">{errors.startDate.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="endDate" className="text-sm font-semibold text-white tracking-wide">End Date</Label>
-            <Input 
-              id="endDate" 
-              type="date" 
-              {...register("endDate")} 
-              className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-            />
-            {errors.endDate && (
-              <p className="text-xs font-medium text-red-500">{errors.endDate.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="reason" className="text-sm font-semibold text-white tracking-wide">Reason</Label>
-          <Textarea
-            id="reason"
-            placeholder="Enter reason for leave"
-            rows={4}
-            {...register("reason")}
-            className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300 resize-none"
-          />
-          {errors.reason && (
-            <p className="text-xs font-medium text-red-500">{errors.reason.message}</p>
-          )}
-        </div>
-
-        {startDate && endDate && duration > 0 && (
-          <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Durasi Pengajuan:</span>
-              <span className="font-semibold text-white">{duration} Hari</span>
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="bg-white border border-[#E1E6EC] rounded-[16px] overflow-hidden">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Section: Leave Details */}
+          <div className="p-8 space-y-5">
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF2F7]">
+                <FileText className="h-4 w-4 text-[#3279F9]" />
+              </div>
+              <h3 className="text-[16px] font-medium text-[#121317]">Leave Details</h3>
             </div>
-            {selectedLeaveTypeName && (
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Jenis Cuti:</span>
-                <span className="font-semibold text-white">{selectedLeaveTypeName}</span>
+
+            {isAdmin && (
+              <div className="space-y-1.5">
+                <Label htmlFor="employeeId" className="text-[14.5px] font-medium text-[#121317]">Employee</Label>
+                <Select 
+                  value={watch("employeeId")} 
+                  onValueChange={(value) => setValue("employeeId", value as string)}
+                >
+                  <SelectTrigger className={selectTriggerClasses}>
+                    <SelectValue placeholder="Select an employee">
+                      {watch("employeeId") ? employees.find(emp => emp.id === watch("employeeId"))?.name : undefined}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((emp) => (
+                      <SelectItem key={emp.id} value={emp.id} className="cursor-pointer">
+                        {emp.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.employeeId && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.employeeId.message}</p>
+                )}
               </div>
             )}
-            {selectedBalance !== null && (
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Sisa Saldo {selectedLeaveTypeName}:</span>
-                <span className="font-semibold text-white">
-                  {isEdit ? `${selectedBalance} Hari (ditambah ${oldDuration} Hari pengajuan ini)` : `${selectedBalance} Hari`}
-                </span>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="leaveTypeId" className="text-[14.5px] font-medium text-[#121317]">Leave Type</Label>
+                <Select 
+                  value={watch("leaveTypeId")} 
+                  onValueChange={(value) => setValue("leaveTypeId", value as string)}
+                >
+                  <SelectTrigger className={selectTriggerClasses}>
+                    <SelectValue placeholder="Select type">
+                      {watch("leaveTypeId") ? leaveTypes.find(lt => lt.id === watch("leaveTypeId"))?.name : undefined}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {leaveTypes.map((lt) => {
+                      const balance = employeeBalances.find((b) => b.leaveTypeId === lt.id);
+                      return (
+                        <SelectItem key={lt.id} value={lt.id} className="cursor-pointer">
+                          {lt.name} {balance ? `(${balance.balance} days)` : ""}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+                {errors.leaveTypeId && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.leaveTypeId.message}</p>
+                )}
               </div>
-            )}
-            {isBalanceInsufficient && (
-              <div className="text-xs font-semibold text-red-400 mt-2 bg-red-500/10 border border-red-500/20 p-3 rounded-xl">
-                ⚠️ Jatah {selectedLeaveTypeName} tidak mencukupi! Durasi pengajuan melebihi sisa saldo cuti Anda.
+
+              <div className="space-y-1.5">
+                <Label htmlFor="approval1Id" className="text-[14.5px] font-medium text-[#121317]">Approval L1</Label>
+                <Select 
+                  value={watch("approval1Id")} 
+                  onValueChange={(value) => setValue("approval1Id", value as string)}
+                >
+                  <SelectTrigger className={selectTriggerClasses}>
+                    <SelectValue placeholder="Select approver">
+                      {watch("approval1Id") ? approvers.find(emp => emp.id === watch("approval1Id"))?.name : undefined}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {approvers.map((emp) => (
+                      <SelectItem key={emp.id} value={emp.id} className="cursor-pointer">
+                        {emp.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.approval1Id && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.approval1Id.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[#E1E6EC]" />
+
+          {/* Section: Schedule */}
+          <div className="p-8 space-y-5">
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF2F7]">
+                <CalendarDays className="h-4 w-4 text-[#3279F9]" />
+              </div>
+              <h3 className="text-[16px] font-medium text-[#121317]">Schedule & Reason</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="startDate" className="text-[14.5px] font-medium text-[#121317]">Start Date</Label>
+                <Input 
+                  id="startDate" 
+                  type="date" 
+                  {...register("startDate")} 
+                  className={inputClasses}
+                />
+                {errors.startDate && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.startDate.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="endDate" className="text-[14.5px] font-medium text-[#121317]">End Date</Label>
+                <Input 
+                  id="endDate" 
+                  type="date" 
+                  {...register("endDate")} 
+                  className={inputClasses}
+                />
+                {errors.endDate && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.endDate.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="reason" className="text-[14.5px] font-medium text-[#121317]">Reason</Label>
+              <Textarea
+                id="reason"
+                placeholder="Describe the reason for your leave request..."
+                rows={4}
+                {...register("reason")}
+                className="bg-white border-[#E1E6EC] rounded-lg px-3.5 py-3 text-[16px] text-[#121317] placeholder:text-[#AAB1CC] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200 resize-none"
+              />
+              {errors.reason && (
+                <p className="text-[14.5px] text-[#FF0000]">{errors.reason.message}</p>
+              )}
+            </div>
+
+            {/* Summary Card */}
+            {startDate && endDate && duration > 0 && (
+              <div className="rounded-[16px] bg-[#EFF2F7] p-5 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <CalendarDays className="h-4 w-4 text-[#3279F9]" />
+                  <span className="text-[14.5px] font-medium text-[#121317]">Request Summary</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white rounded-lg p-3 border border-[#E1E6EC]">
+                    <p className="text-[12px] text-[#6A6A71] mb-0.5">Duration</p>
+                    <p className="text-[16px] font-medium text-[#121317]">{duration} Day{duration > 1 ? "s" : ""}</p>
+                  </div>
+                  {selectedLeaveTypeName && (
+                    <div className="bg-white rounded-lg p-3 border border-[#E1E6EC]">
+                      <p className="text-[12px] text-[#6A6A71] mb-0.5">Leave Type</p>
+                      <p className="text-[16px] font-medium text-[#121317]">{selectedLeaveTypeName}</p>
+                    </div>
+                  )}
+                  {selectedBalance !== null && (
+                    <div className="bg-white rounded-lg p-3 border border-[#E1E6EC] col-span-2">
+                      <p className="text-[12px] text-[#6A6A71] mb-0.5">Available Balance ({selectedLeaveTypeName})</p>
+                      <p className="text-[16px] font-medium text-[#121317]">
+                        {isEdit ? `${selectedBalance} Days (+${oldDuration} refund from current request)` : `${selectedBalance} Days`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {isBalanceInsufficient && (
+                  <div className="flex items-start gap-2.5 rounded-lg border border-[#FF0000] bg-[rgba(255,0,0,0.02)] px-4 py-3 mt-2">
+                    <AlertTriangle className="h-4 w-4 text-[#FF0000] shrink-0 mt-0.5" />
+                    <p className="text-[14.5px] text-[#FF0000]">
+                      Insufficient balance! The requested duration exceeds your available {selectedLeaveTypeName} balance.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
 
-        <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-          <Button 
-            type="submit" 
-            disabled={isSubmitting || isBalanceInsufficient}
-            className="flex-1 bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-red-500/20 py-2.5 font-semibold transition-all duration-300 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? "Submitting..." : isEdit ? "Update Leave Request" : "Submit Leave Request"}
-          </Button>
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => router.push(ROUTES.LEAVE)}
-            className="flex-1 border-white/10 hover:border-white/20 bg-transparent text-muted-foreground hover:text-white rounded-xl py-2.5 transition-all duration-300"
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
+          {/* Footer Actions */}
+          <div className="border-t border-[#E1E6EC] bg-[#F8F9FC] px-8 py-5">
+            <div className="flex items-center justify-end gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => router.push(ROUTES.LEAVE)}
+                className="px-6"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                variant="cta"
+                size="lg"
+                disabled={isSubmitting || isBalanceInsufficient}
+                className="px-6 group"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Submitting...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    {isEdit ? "Update Request" : "Submit Request"}
+                    <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

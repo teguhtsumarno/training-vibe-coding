@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -198,21 +198,21 @@ export default function CalendarPage() {
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
+            <h1 className="text-3xl font-heading font-medium tracking-tight text-[#121317]">
               Kalender Cuti
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">Lihat siapa saja yang sedang cuti per bulan</p>
+            <p className="text-sm text-[#6A6A71] mt-1">Lihat siapa saja yang sedang cuti per bulan</p>
           </div>
 
           {/* Today's Summary Card */}
-          <div className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-2xl p-5 shadow-lg shadow-blue-500/5">
+          <div className="bg-[#EFF2F7] border border-[#E1E6EC] rounded-2xl p-5 ">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
                 <Clock className="h-5 w-5 text-blue-400" />
               </div>
               <div>
-                <h2 className="font-heading font-bold text-white text-lg">Hari Ini — {today.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="font-heading font-bold text-[#121317] text-lg">Hari Ini — {today.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</h2>
+                <p className="text-sm text-[#6A6A71]">
                   {todayLeaves.length === 0
                     ? "Tidak ada karyawan yang sedang cuti"
                     : `${todayLeaves.length} karyawan sedang cuti`}
@@ -254,18 +254,18 @@ export default function CalendarPage() {
                 variant="ghost"
                 size="icon"
                 onClick={handlePrevMonth}
-                className="h-9 w-9 rounded-xl text-muted-foreground hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300"
+                className="h-9 w-9 rounded-xl text-[#6A6A71] hover:text-[#121317] hover:bg-[#F8F9FC] border border-transparent hover:border-[#E1E6EC] transition-all duration-300"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-xl font-heading font-bold text-white min-w-[200px] text-center">
+              <h2 className="text-xl font-heading font-bold text-[#121317] min-w-[200px] text-center">
                 {MONTHS[currentMonth]} {currentYear}
               </h2>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleNextMonth}
-                className="h-9 w-9 rounded-xl text-muted-foreground hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300"
+                className="h-9 w-9 rounded-xl text-[#6A6A71] hover:text-[#121317] hover:bg-[#F8F9FC] border border-transparent hover:border-[#E1E6EC] transition-all duration-300"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -275,7 +275,7 @@ export default function CalendarPage() {
                 variant="ghost"
                 size="sm"
                 onClick={handleGoToday}
-                className="rounded-xl text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-blue-500/20 transition-all duration-300"
+                className="rounded-xl text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-[#E1E6EC] transition-all duration-300"
               >
                 <Calendar className="h-3.5 w-3.5 mr-1.5" />
                 Hari Ini
@@ -285,15 +285,15 @@ export default function CalendarPage() {
 
           {/* Calendar Grid */}
           {loading ? (
-            <div className="text-center py-16 text-muted-foreground">Loading...</div>
+            <div className="text-center py-16 text-[#6A6A71]">Loading...</div>
           ) : (
-            <div className="rounded-2xl border border-white/5 bg-[#09090b] shadow-xl shadow-blue-500/5 overflow-hidden">
+            <div className="border border-[#E1E6EC] overflow-hidden">
               {/* Day Headers */}
-              <div className="grid grid-cols-7 bg-black/40 border-b border-white/5">
+              <div className="grid grid-cols-7 bg-[#F8F9FC] border-b border-[#E1E6EC]">
                 {DAYS.map((day) => (
                   <div
                     key={day}
-                    className="py-3 text-center text-xs font-heading font-semibold text-muted-foreground tracking-widest uppercase"
+                    className="py-3 text-center text-xs font-heading font-semibold text-[#6A6A71] tracking-widest uppercase"
                   >
                     {day}
                   </div>
@@ -304,7 +304,7 @@ export default function CalendarPage() {
               <div className="grid grid-cols-7">
                 {/* Empty cells for days before the 1st */}
                 {Array.from({ length: firstDay }).map((_, i) => (
-                  <div key={`empty-${i}`} className="min-h-[100px] border-b border-r border-white/5 bg-black/20" />
+                  <div key={`empty-${i}`} className="min-h-[100px] border-b border-r border-[#E1E6EC] bg-[#F8F9FC]" />
                 ))}
 
                 {/* Actual days */}
@@ -318,7 +318,7 @@ export default function CalendarPage() {
                     <div
                       key={day}
                       onClick={() => handleDayClick(day)}
-                      className={`min-h-[100px] border-b border-r border-white/5 p-1.5 cursor-pointer transition-all duration-200 hover:bg-white/5 relative ${
+                      className={`min-h-[100px] border-b border-r border-[#E1E6EC] p-1.5 cursor-pointer transition-all duration-200 hover:bg-[#F8F9FC] relative ${
                         isToday ? "bg-blue-500/5 ring-1 ring-inset ring-blue-500/30" : ""
                       }`}
                     >
@@ -327,16 +327,16 @@ export default function CalendarPage() {
                         <span
                           className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold ${
                             isToday
-                              ? "bg-gradient-to-r from-red-600 to-blue-600 text-white shadow-md shadow-red-500/20"
+                              ? "bg-[#121317] text-[#121317]"
                               : hasLeaves
-                              ? "text-white"
-                              : "text-muted-foreground"
+                              ? "text-[#121317]"
+                              : "text-[#6A6A71]"
                           }`}
                         >
                           {day}
                         </span>
                         {hasLeaves && (
-                          <span className="text-[10px] font-medium text-muted-foreground bg-white/5 px-1.5 py-0.5 rounded-md">
+                          <span className="text-[10px] font-medium text-[#6A6A71] bg-[#F8F9FC] px-1.5 py-0.5 rounded-md">
                             {leavesOnDay.length}
                           </span>
                         )}
@@ -357,7 +357,7 @@ export default function CalendarPage() {
                           );
                         })}
                         {leavesOnDay.length > 3 && (
-                          <div className="text-[10px] text-muted-foreground font-medium pl-1">
+                          <div className="text-[10px] text-[#6A6A71] font-medium pl-1">
                             +{leavesOnDay.length - 3} lainnya
                           </div>
                         )}
@@ -371,7 +371,7 @@ export default function CalendarPage() {
                   const totalCells = firstDay + daysInMonth;
                   const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
                   return Array.from({ length: remaining }).map((_, i) => (
-                    <div key={`fill-${i}`} className="min-h-[100px] border-b border-r border-white/5 bg-black/20" />
+                    <div key={`fill-${i}`} className="min-h-[100px] border-b border-r border-[#E1E6EC] bg-[#F8F9FC]" />
                   ));
                 })()}
               </div>
@@ -379,8 +379,8 @@ export default function CalendarPage() {
           )}
 
           {/* Legend */}
-          <div className="bg-[#09090b] border border-white/5 rounded-2xl p-4 shadow-lg">
-            <h3 className="text-sm font-heading font-semibold text-white mb-3">Legenda Karyawan</h3>
+          <div className="bg-white border border-[#E1E6EC] rounded-2xl p-4 shadow-lg">
+            <h3 className="text-sm font-heading font-semibold text-[#121317] mb-3">List Karyawan</h3>
             <div className="flex flex-wrap gap-2">
               {employees.map((emp) => {
                 const color = employeeColorMap.get(emp.id) || EMPLOYEE_COLORS[0];
@@ -401,14 +401,14 @@ export default function CalendarPage() {
 
       {/* Detail Dialog */}
       <Dialog open={detailDialog.open} onOpenChange={(open) => setDetailDialog({ ...detailDialog, open })}>
-        <DialogContent className="bg-[#09090b] border border-white/10 text-white rounded-2xl max-w-md w-full shadow-2xl shadow-blue-500/10">
+        <DialogContent className="bg-white border border-[#E1E6EC] text-[#121317] rounded-2xl max-w-md w-full ">
           <DialogHeader>
-            <DialogTitle className="text-xl font-heading font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
+            <DialogTitle className="text-xl font-heading font-medium tracking-wide text-[#121317]">
               {detailDialog.date
                 ? detailDialog.date.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                 : "Detail Cuti"}
             </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
+            <DialogDescription className="text-sm text-[#6A6A71]">
               {detailDialog.leaves.length === 0
                 ? "Tidak ada karyawan yang cuti pada tanggal ini"
                 : `${detailDialog.leaves.length} karyawan cuti pada tanggal ini`}
@@ -442,30 +442,30 @@ export default function CalendarPage() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                    <div className="grid grid-cols-2 gap-2 text-xs text-[#6A6A71]">
                       <div>
-                        <span className="block text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-0.5">Departemen</span>
-                        <span className="text-white/80">{item.employee.department}</span>
+                        <span className="block text-[10px] uppercase tracking-wider text-[#6A6A71]/60 mb-0.5">Departemen</span>
+                        <span className="text-[#45474D]">{item.employee.department}</span>
                       </div>
                       <div>
-                        <span className="block text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-0.5">Jenis Cuti</span>
-                        <span className="text-white/80">{item.request.leaveType?.name || "—"}</span>
+                        <span className="block text-[10px] uppercase tracking-wider text-[#6A6A71]/60 mb-0.5">Jenis Cuti</span>
+                        <span className="text-[#45474D]">{item.request.leaveType?.name || "—"}</span>
                       </div>
                       <div>
-                        <span className="block text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-0.5">Periode</span>
-                        <span className="text-white/80">
+                        <span className="block text-[10px] uppercase tracking-wider text-[#6A6A71]/60 mb-0.5">Periode</span>
+                        <span className="text-[#45474D]">
                           {start.toLocaleDateString("id-ID", { day: "numeric", month: "short" })} — {end.toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
                         </span>
                       </div>
                       <div>
-                        <span className="block text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-0.5">Durasi</span>
-                        <span className="text-white/80">{duration} Hari</span>
+                        <span className="block text-[10px] uppercase tracking-wider text-[#6A6A71]/60 mb-0.5">Durasi</span>
+                        <span className="text-[#45474D]">{duration} Hari</span>
                       </div>
                     </div>
 
-                    <div className="text-xs text-muted-foreground">
-                      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-0.5">Alasan</span>
-                      <span className="text-white/70">{item.request.reason}</span>
+                    <div className="text-xs text-[#6A6A71]">
+                      <span className="block text-[10px] uppercase tracking-wider text-[#6A6A71]/60 mb-0.5">Alasan</span>
+                      <span className="text-[#45474D]">{item.request.reason}</span>
                     </div>
                   </div>
                 );
@@ -473,10 +473,10 @@ export default function CalendarPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10 mb-3">
-                <Users className="h-5 w-5 text-muted-foreground" />
+              <div className="w-12 h-12 rounded-full bg-[#F8F9FC] flex items-center justify-center border border-[#E1E6EC] mb-3">
+                <Users className="h-5 w-5 text-[#6A6A71]" />
               </div>
-              <p className="text-sm text-muted-foreground">Semua karyawan sedang bekerja pada tanggal ini</p>
+              <p className="text-sm text-[#6A6A71]">Semua karyawan sedang bekerja pada tanggal ini</p>
             </div>
           )}
         </DialogContent>

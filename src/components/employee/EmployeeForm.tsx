@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { employeeSchema, type EmployeeFormValues } from "@/validators/employee-validator";
 import { ROUTES } from "@/constants";
+import { ArrowRight, User, Briefcase, Mail, Shield, KeyRound } from "lucide-react";
 
 interface EmployeeFormProps {
   defaultValues?: EmployeeFormValues;
@@ -35,128 +36,175 @@ export default function EmployeeForm({ defaultValues, onSubmit, isEdit = false }
     defaultValues: defaultValues ?? { name: "", department: "", position: "", username: "", password: "", email: "", role: "user" },
   });
 
+  const inputClasses = "h-11 bg-white border-[#E1E6EC] rounded-lg px-3.5 text-[16px] text-[#121317] placeholder:text-[#AAB1CC] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200";
+
   return (
-    <div className="bg-[#09090b] border border-white/5 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl shadow-blue-500/5">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm font-semibold text-white tracking-wide">Name</Label>
-          <Input 
-            id="name" 
-            placeholder="Enter employee name" 
-            {...register("name")} 
-            className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-          />
-          {errors.name && (
-            <p className="text-xs font-medium text-red-500">{errors.name.message}</p>
-          )}
-        </div>
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="bg-white border border-[#E1E6EC] rounded-[16px] overflow-hidden">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Section: Personal Info */}
+          <div className="p-8 space-y-5">
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF2F7]">
+                <User className="h-4 w-4 text-[#3279F9]" />
+              </div>
+              <h3 className="text-[16px] font-medium text-[#121317]">Personal Information</h3>
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="department" className="text-sm font-semibold text-white tracking-wide">Department</Label>
-          <Input 
-            id="department" 
-            placeholder="Enter department" 
-            {...register("department")} 
-            className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-          />
-          {errors.department && (
-            <p className="text-xs font-medium text-red-500">{errors.department.message}</p>
-          )}
-        </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-[14.5px] font-medium text-[#121317]">Full Name</Label>
+              <Input 
+                id="name" 
+                placeholder="e.g. John Doe" 
+                {...register("name")} 
+                className={inputClasses}
+              />
+              {errors.name && (
+                <p className="text-[14.5px] text-[#FF0000]">{errors.name.message}</p>
+              )}
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="position" className="text-sm font-semibold text-white tracking-wide">Position</Label>
-          <Input 
-            id="position" 
-            placeholder="Enter position" 
-            {...register("position")} 
-            className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-          />
-          {errors.position && (
-            <p className="text-xs font-medium text-red-500">{errors.position.message}</p>
-          )}
-        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="department" className="text-[14.5px] font-medium text-[#121317]">Department</Label>
+                <Input 
+                  id="department" 
+                  placeholder="e.g. Engineering" 
+                  {...register("department")} 
+                  className={inputClasses}
+                />
+                {errors.department && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.department.message}</p>
+                )}
+              </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="username" className="text-sm font-semibold text-white tracking-wide">Username</Label>
-            <Input 
-              id="username" 
-              placeholder="Enter username" 
-              {...register("username")} 
-              className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-            />
-            {errors.username && (
-              <p className="text-xs font-medium text-red-500">{errors.username.message}</p>
-            )}
+              <div className="space-y-1.5">
+                <Label htmlFor="position" className="text-[14.5px] font-medium text-[#121317]">Position</Label>
+                <Input 
+                  id="position" 
+                  placeholder="e.g. Software Engineer" 
+                  {...register("position")} 
+                  className={inputClasses}
+                />
+                {errors.position && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.position.message}</p>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-semibold text-white tracking-wide">Password</Label>
-            <Input 
-              id="password" 
-              type="password"
-              placeholder="Enter password" 
-              {...register("password")} 
-              className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-            />
-            {errors.password && (
-              <p className="text-xs font-medium text-red-500">{errors.password.message}</p>
-            )}
+          {/* Divider */}
+          <div className="border-t border-[#E1E6EC]" />
+
+          {/* Section: Account & Security */}
+          <div className="p-8 space-y-5">
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EFF2F7]">
+                <KeyRound className="h-4 w-4 text-[#3279F9]" />
+              </div>
+              <h3 className="text-[16px] font-medium text-[#121317]">Account & Security</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="username" className="text-[14.5px] font-medium text-[#121317]">Username</Label>
+                <Input 
+                  id="username" 
+                  placeholder="e.g. johndoe" 
+                  {...register("username")} 
+                  className={inputClasses}
+                />
+                {errors.username && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.username.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-[14.5px] font-medium text-[#121317]">Password</Label>
+                <Input 
+                  id="password" 
+                  type="password"
+                  placeholder="••••••••" 
+                  {...register("password")} 
+                  className={inputClasses}
+                />
+                {errors.password && (
+                  <p className="text-[14.5px] text-[#FF0000]">{errors.password.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-[14.5px] font-medium text-[#121317]">Email Address</Label>
+              <Input 
+                id="email" 
+                type="email"
+                placeholder="employee@company.com" 
+                {...register("email")} 
+                className={inputClasses}
+              />
+              {errors.email && (
+                <p className="text-[14.5px] text-[#FF0000]">{errors.email.message}</p>
+              )}
+              <p className="text-[14.5px] text-[#6A6A71] mt-1">Used for leave request email notifications</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="role" className="text-[14.5px] font-medium text-[#121317]">Role</Label>
+              <Select onValueChange={(value) => setValue("role", value as any)} defaultValue={defaultValues?.role}>
+                <SelectTrigger className="h-11 bg-white border-[#E1E6EC] rounded-lg text-[16px] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user" className="cursor-pointer">Employee</SelectItem>
+                  <SelectItem value="approval1" className="cursor-pointer">Approval Level 1</SelectItem>
+                  <SelectItem value="approval2" className="cursor-pointer">Approval Level 2</SelectItem>
+                  <SelectItem value="admin" className="cursor-pointer">Administrator</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.role && (
+                <p className="text-[14.5px] text-[#FF0000]">{errors.role.message}</p>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-semibold text-white tracking-wide">Email</Label>
-          <Input 
-            id="email" 
-            type="email"
-            placeholder="employee@company.com" 
-            {...register("email")} 
-            className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300"
-          />
-          {errors.email && (
-            <p className="text-xs font-medium text-red-500">{errors.email.message}</p>
-          )}
-          <p className="text-xs text-muted-foreground">Digunakan untuk notifikasi email pengajuan cuti</p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="role" className="text-sm font-semibold text-white tracking-wide">Role</Label>
-          <Select onValueChange={(value) => setValue("role", value as any)} defaultValue={defaultValues?.role}>
-            <SelectTrigger className="bg-[#030303] border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/25 transition-all duration-300">
-              <SelectValue placeholder="Select a role" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#09090b] border border-white/5 rounded-xl">
-              <SelectItem value="user" className="focus:bg-blue-500/10 focus:text-white cursor-pointer">User</SelectItem>
-              <SelectItem value="approval1" className="focus:bg-blue-500/10 focus:text-white cursor-pointer">Approval 1</SelectItem>
-              <SelectItem value="approval2" className="focus:bg-blue-500/10 focus:text-white cursor-pointer">Approval 2</SelectItem>
-              <SelectItem value="admin" className="focus:bg-blue-500/10 focus:text-white cursor-pointer">Admin</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.role && (
-            <p className="text-xs font-medium text-red-500">{errors.role.message}</p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="flex-1 bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-red-500/20 py-2.5 font-semibold transition-all duration-300 border-0"
-          >
-            {isSubmitting ? "Saving..." : isEdit ? "Update Employee" : "Create Employee"}
-          </Button>
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => router.push(ROUTES.EMPLOYEES)}
-            className="flex-1 border-white/10 hover:border-white/20 bg-transparent text-muted-foreground hover:text-white rounded-xl py-2.5 transition-all duration-300"
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
+          {/* Footer Actions */}
+          <div className="border-t border-[#E1E6EC] bg-[#F8F9FC] px-8 py-5">
+            <div className="flex items-center justify-end gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => router.push(ROUTES.EMPLOYEES)}
+                className="px-6"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                variant="cta"
+                size="lg"
+                disabled={isSubmitting}
+                className="px-6 group"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Saving...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    {isEdit ? "Update Employee" : "Create Employee"}
+                    <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

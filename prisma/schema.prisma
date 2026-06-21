@@ -69,6 +69,7 @@ model ApprovalHistory {
   action         String       // "CREATED", "APPROVED_L1", "APPROVED_L2", "APPROVED", "REJECTED"
   actorId        String?
   actorName      String?
+  message        String?
   createdAt      DateTime     @default(now())
 
   // Relations

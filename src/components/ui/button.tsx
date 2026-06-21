@@ -5,25 +5,29 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-[9999px] text-[14.5px] font-medium leading-[21.02px] transition-all duration-200 outline-none focus-visible:outline-2 focus-visible:outline-[#3279F9] focus-visible:outline-offset-2 disabled:pointer-events-none disabled:text-[#AAB1CC] disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default:
+          "bg-transparent text-[#45474D] border border-transparent hover:bg-[rgba(183,191,217,0.09)] hover:text-[#121317] active:bg-[rgba(183,191,217,0.15)] active:text-[#121317]",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-[#FF0000] text-white border border-[#FF0000] hover:bg-red-600 hover:border-red-600 active:bg-red-700 active:border-red-700",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-[#E1E6EC] bg-white text-[#45474D] hover:bg-[rgba(183,191,217,0.09)] hover:text-[#121317] active:bg-[rgba(183,191,217,0.15)]",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-transparent text-[#45474D] border border-transparent hover:bg-[rgba(183,191,217,0.09)] hover:text-[#121317]",
+        ghost:
+          "bg-transparent text-[#45474D] border-none hover:bg-[rgba(183,191,217,0.09)] hover:text-[#121317] active:bg-[rgba(183,191,217,0.15)]",
+        link: "text-[#45474D] underline-offset-4 bg-transparent border-none hover:underline hover:text-[#121317]",
+        cta:
+          "bg-[#121317] text-white border border-[#121317] hover:bg-[#212226] hover:border-[#212226] active:bg-[#18191D] active:border-[#18191D]",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "h-9 px-4 py-1.5",
+        sm: "h-8 px-3 py-1",
+        lg: "h-10 px-5 py-2.5 rounded-[45px]",
+        icon: "h-9 w-9 p-0",
       },
     },
     defaultVariants: {

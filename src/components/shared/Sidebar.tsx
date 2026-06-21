@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, User } from "lucide-react";
 
 const getNavLinks = (role?: string) => {
   const links: { href: string; label: string }[] = [{ href: ROUTES.DASHBOARD, label: "Dashboard" }];
@@ -37,10 +37,24 @@ const getNavLinks = (role?: string) => {
   return links;
 };
 
+function getRoleLabel(role?: string) {
+  switch (role) {
+    case "admin": return "Administrator";
+    case "approval1": return "Approval Level 1";
+    case "approval2": return "Approval Level 2";
+    case "user": return "Employee";
+    default: return "User";
+  }
+}
+
+function getInitials(username?: string) {
+  if (!username) return "U";
+  return username.slice(0, 2).toUpperCase();
+}
+
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const { session, logout } = useAuth();
 
   if (([ROUTES.LOGIN, ROUTES.CODE_REVIEW] as string[]).includes(pathname)) {
@@ -54,55 +68,78 @@ export default function Sidebar() {
 
   return (
     <div className="md:hidden">
-      <div className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center border-b border-white/10 bg-black/60 backdrop-blur-md px-4 justify-between">
+      <div className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center border-b border-[#E1E6EC] bg-white px-4 justify-between">
+        {/* Left: Hamburger + Title */}
         <div className="flex items-center">
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger render={<Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/5" />}>
-              <Menu className="h-5 w-5" />
+            <SheetTrigger render={<Button variant="ghost" size="icon" className="rounded-full hover:bg-[rgba(183,191,217,0.09)]" />}>
+              <Menu className="h-5 w-5 text-[#121317]" />
               <span className="sr-only">Toggle menu</span>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 bg-[#09090b] border-r border-white/10 p-6 flex flex-col justify-between">
-              <div>
-                <SheetHeader className="mb-8">
-                  <SheetTitle className="text-left font-heading font-extrabold text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
-                    Leave Management
-                  </SheetTitle>
-                </SheetHeader>
-                <nav className="flex flex-col gap-2">
-                  {getNavLinks(session?.role).map((link) => {
-                    const isActive = pathname.startsWith(link.href);
-                    return (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
-                          isActive
-                            ? "bg-gradient-to-r from-red-600 to-blue-600 text-white shadow-md shadow-red-500/20 font-semibold"
-                            : "text-muted-foreground hover:text-white hover:bg-white/5"
-                        }`}
-                      >
-                        {link.label}
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </div>
-              <div className="pt-4 border-t border-white/10">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start rounded-xl text-muted-foreground hover:text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all duration-300"
+            <SheetContent side="left" className="w-72 bg-white border-r border-[#E1E6EC] p-0 flex flex-col">
+              {/* Header */}
+              <SheetHeader className="p-6 pb-4">
+                <SheetTitle className="text-left font-heading font-medium text-xl tracking-wider text-[#121317]">
+                  Leave Management
+                </SheetTitle>
+              </SheetHeader>
+
+              {/* Navigation Links */}
+              <nav className="flex flex-col gap-1 px-4 flex-1">
+                {getNavLinks(session?.role).map((link) => {
+                  const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className={`px-4 py-2.5 rounded-[9999px] text-[14.5px] font-medium transition-all duration-200 ${
+                        isActive
+                          ? "bg-[rgba(50,121,249,0.1)] text-[#3279F9]"
+                          : "text-[#45474D] hover:text-[#121317] hover:bg-[rgba(183,191,217,0.09)]"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* User Profile Section at bottom */}
+              <div className="border-t border-[#E1E6EC] p-4">
+                <div className="flex items-center gap-3 px-2 py-2 mb-2">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#3279F9] text-white text-[14px] font-medium shrink-0">
+                    {getInitials(session?.username)}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[14.5px] font-medium text-[#121317]">
+                      {session?.username || "User"}
+                    </span>
+                    <span className="text-[12px] text-[#6A6A71]">
+                      {getRoleLabel(session?.role)}
+                    </span>
+                  </div>
+                </div>
+                <button
                   onClick={handleLogout}
+                  className="flex w-full items-center gap-2 rounded-[9999px] px-4 py-2.5 text-[14.5px] font-medium text-[#FF0000] transition-all duration-200 hover:bg-[rgba(255,0,0,0.04)] cursor-pointer"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-4 w-4" />
                   Logout
-                </Button>
+                </button>
               </div>
             </SheetContent>
           </Sheet>
-          <span className="ml-3 font-heading font-bold text-lg tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
+          <span className="ml-3 font-heading font-medium text-lg tracking-wide text-[#121317]">
             Leave Management
           </span>
+        </div>
+
+        {/* Right: User Avatar on mobile header */}
+        <div className="flex items-center">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3279F9] text-white text-[13px] font-medium">
+            {getInitials(session?.username)}
+          </div>
         </div>
       </div>
     </div>

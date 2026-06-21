@@ -38,6 +38,7 @@ export default function LeavePage() {
     action: "approve" | "reject";
     requestId: string;
   }>({ open: false, action: "approve", requestId: "" });
+  const [actionLoading, setActionLoading] = useState(false);
 
   const [employees, setEmployees] = useState<Employee[]>([]);
 
@@ -79,16 +80,24 @@ export default function LeavePage() {
     setActionDialog({ open: true, action: "reject", requestId: id });
   };
 
-  const handleActionConfirm = async () => {
-    if (actionDialog.action === "approve") {
-      await approveLeaveRequest(actionDialog.requestId, session?.role || "user");
-      toast.success("Leave request approved");
-    } else {
-      await rejectLeaveRequest(actionDialog.requestId);
-      toast.success("Leave request rejected");
+  const handleActionConfirm = async (message: string) => {
+    setActionLoading(true);
+    try {
+      if (actionDialog.action === "approve") {
+        await approveLeaveRequest(actionDialog.requestId, session?.role || "user", message);
+        toast.success("Leave request approved");
+      } else {
+        await rejectLeaveRequest(actionDialog.requestId, message);
+        toast.success("Leave request rejected");
+      }
+      loadData();
+    } catch (error: any) {
+      console.error("Failed to process leave action:", error);
+      toast.error(error.message || "Failed to process leave request");
+    } finally {
+      setActionLoading(false);
+      setActionDialog({ ...actionDialog, open: false });
     }
-    loadData();
-    setActionDialog({ ...actionDialog, open: false });
   };
   const handleDeleteClick = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this leave request?")) {
@@ -130,7 +139,7 @@ export default function LeavePage() {
         description={session?.role?.startsWith("approval") ? "Review and manage pending leave requests" : "Manage employee leave requests"}
         action={
           (session?.role === "admin" || session?.role === "user") ? (
-            <Button asChild className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-red-500/20 px-5 font-semibold transition-all duration-300 border-0 cursor-pointer">
+            <Button asChild variant="cta" className="px-5 cursor-pointer">
               <Link href={ROUTES.LEAVE_NEW}>
                 <Plus className="h-4 w-4 mr-2" />
                 New Request
@@ -155,13 +164,14 @@ export default function LeavePage() {
         open={actionDialog.open}
         onOpenChange={(open) => setActionDialog({ ...actionDialog, open })}
         action={actionDialog.action}
+        loading={actionLoading}
         onConfirm={handleActionConfirm}
       />
 
       <Dialog open={historyDialog.open} onOpenChange={(open) => setHistoryDialog({ ...historyDialog, open })}>
-        <DialogContent className="bg-[#09090b] border border-white/10 text-white rounded-2xl max-w-md w-full shadow-2xl shadow-blue-500/10">
+        <DialogContent className="bg-white border border-[#E1E6EC] text-[#121317] rounded-2xl max-w-md w-full ">
           <DialogHeader>
-            <DialogTitle className="text-xl font-heading font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-purple-500 to-blue-500">
+            <DialogTitle className="text-xl font-heading font-medium tracking-wide text-[#121317]">
               Approval History
             </DialogTitle>
           </DialogHeader>
@@ -169,14 +179,14 @@ export default function LeavePage() {
           {isHistoryLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2" />
-              <p className="text-sm text-muted-foreground">Loading history...</p>
+              <p className="text-sm text-[#6A6A71]">Loading history...</p>
             </div>
           ) : historyData.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground text-sm">
+            <div className="text-center py-12 text-[#6A6A71] text-sm">
               No approval history recorded.
             </div>
           ) : (
-            <div className="relative border-l border-white/10 ml-4 pl-6 space-y-8 my-4 max-h-[60vh] overflow-y-auto">
+            <div className="relative border-l border-[#E1E6EC] ml-4 pl-6 space-y-8 my-4 max-h-[60vh] overflow-y-auto">
               {historyData.map((item) => {
                 const date = new Date(item.createdAt);
                 const prettyDate = date.toLocaleDateString("id-ID", {
@@ -216,16 +226,21 @@ export default function LeavePage() {
                 return (
                   <div key={item.id} className="relative">
                     <span className={`absolute -left-[31px] top-1.5 flex h-4 w-4 rounded-full ${dotColor}`} />
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${badgeStyle}`}>
                           {actionText}
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-white">
+                      <p className="text-sm font-medium text-[#121317]">
                         Oleh: {item.actorName || "Sistem"}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      {item.message && (
+                        <div className="bg-[#F8F9FC] border border-[#E1E6EC] rounded-lg px-3 py-2">
+                          <p className="text-[14.5px] text-[#45474D] italic">&ldquo;{item.message}&rdquo;</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-[#6A6A71]">
                         {prettyDate} WIB
                       </p>
                     </div>

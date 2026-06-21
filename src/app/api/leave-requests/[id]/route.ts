@@ -9,7 +9,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await req.json();
-    const { status, employeeId, approval1Id, leaveTypeId, startDate, endDate, reason, actorId } = body;
+    const { status, employeeId, approval1Id, leaveTypeId, startDate, endDate, reason, actorId, message } = body;
 
     if (!status && !employeeId && !approval1Id && !startDate && !endDate && !reason && !leaveTypeId) {
       return NextResponse.json({ success: false, error: "No update fields provided" }, { status: 400 });
@@ -138,6 +138,7 @@ export async function PUT(
                 action,
                 actorId: computedActorId || null,
                 actorName: actorNameResolved,
+                message: message || null,
               },
             },
           }),
@@ -147,7 +148,7 @@ export async function PUT(
           leaveType: true,
         },
       });
-    });
+    }, { timeout: 15000 });
 
     // Send email notifications based on status change
     if (status !== undefined && status !== existing.status) {

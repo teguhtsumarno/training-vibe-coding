@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+﻿import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { ReactNode } from "react";
 import Link from "next/link";
@@ -50,7 +50,7 @@ const SEVERITIES: SeverityKey[] = ["Critical", "High", "Medium", "Low"];
 const severityStyles: Record<SeverityKey, { badge: string; bar: string; icon: ReactNode }> = {
   Critical: {
     badge: "bg-red-500/15 text-red-200 border border-red-500/30",
-    bar: "from-red-500 via-pink-500 to-orange-500",
+    bar: "bg-[#3279F9]",
     icon: <AlertTriangle className="h-4 w-4" />,
   },
   High: {
@@ -209,11 +209,11 @@ function CircularStat({ value, label, caption }: { value: number; label: string;
           </defs>
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-heading font-extrabold text-white">{safeValue}%</span>
-          <span className="text-xs uppercase tracking-widest text-white/60">{label}</span>
+          <span className="text-4xl font-heading font-medium text-[#121317]">{safeValue}%</span>
+          <span className="text-xs uppercase tracking-widest text-[#121317]/60">{label}</span>
         </div>
       </div>
-      <p className="text-xs text-center text-muted-foreground max-w-[160px]">{caption}</p>
+      <p className="text-xs text-center text-[#6A6A71] max-w-[160px]">{caption}</p>
     </div>
   );
 }
@@ -224,7 +224,7 @@ function SeverityBadge({ level }: { level: string }) {
 
   if (!style) {
     return (
-      <Badge variant="outline" className="border-white/15 text-muted-foreground">
+      <Badge variant="outline" className="border-[#E1E6EC] text-[#6A6A71]">
         {level}
       </Badge>
     );
@@ -279,7 +279,7 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
 
   return (
     <section className="mx-auto max-w-6xl space-y-6">
-      <Card className="group relative overflow-hidden border-white/10 bg-gradient-to-br from-[#050505] via-[#090921] to-[#0f172a] transition-all duration-700 hover:-translate-y-1 hover:border-blue-400/30 hover:shadow-[0_35px_120px_rgba(59,130,246,0.35)] active:scale-[0.995]">
+      <Card className="group relative overflow-hidden border-[#E1E6EC] bg-gradient-to-br from-[#050505] via-[#090921] to-[#0f172a] transition-all duration-700 hover:-translate-y-1 hover:border-blue-400/30 hover:shadow-[0_35px_120px_rgba(59,130,246,0.35)] active:scale-[0.995]">
         <div className="pointer-events-none absolute inset-0 opacity-60" aria-hidden>
           <div className="absolute -left-24 top-10 h-48 w-48 rounded-full bg-blue-500/30 blur-[120px] transition-transform duration-700 group-hover:translate-y-2" />
           <div className="absolute -right-16 bottom-0 h-52 w-52 rounded-full bg-purple-500/30 blur-[140px] transition-transform duration-700 group-hover:-translate-y-1" />
@@ -289,17 +289,17 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
             <Badge className="bg-emerald-500/20 text-emerald-100 border border-emerald-500/30 transition-all duration-300 hover:border-emerald-300/60">
               Public dashboard
             </Badge>
-            <Badge variant="outline" className="border-white/15 text-white/80 transition-all duration-300 hover:border-white/40">
+            <Badge variant="outline" className="border-[#E1E6EC] text-[#45474D] transition-all duration-300 hover:border-[#E1E6EC]">
               <span className="font-semibold">Review Date:</span>&nbsp;{reviewDate}
             </Badge>
           </div>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <CardTitle className="text-3xl md:text-4xl font-heading font-black tracking-tight text-white flex items-center gap-3">
+              <CardTitle className="text-3xl md:text-4xl font-heading font-black tracking-tight text-[#121317] flex items-center gap-3">
                 <ShieldCheck className="h-8 w-8 text-blue-300 transition-transform duration-500 group-hover:rotate-6" />
                 Code Review Intelligence Board
               </CardTitle>
-              <CardDescription className="mt-2 text-base text-white/80">
+              <CardDescription className="mt-2 text-base text-[#45474D]">
                 Snapshot kualitas terbaru untuk Employee Leave Management System.
               </CardDescription>
             </div>
@@ -316,14 +316,14 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
               </Badge>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-3 text-sm text-white/70 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 text-sm text-[#45474D] sm:grid-cols-3">
             {heroHighlights.map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition-all duration-300 hover:-translate-y-1 hover:border-white/40"
+                className="rounded-2xl border border-[#E1E6EC] bg-[#F8F9FC] px-4 py-3 transition-all duration-300 hover:-translate-y-1 hover:border-[#E1E6EC]"
               >
-                <p className="text-xs uppercase tracking-[0.2em] text-white/40">{item.label}</p>
-                <p className="mt-1 text-lg font-semibold text-white">{item.value}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-[#121317]/40">{item.label}</p>
+                <p className="mt-1 text-lg font-semibold text-[#121317]">{item.value}</p>
               </div>
             ))}
           </div>
@@ -331,9 +331,9 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
       </Card>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card className="bg-[#09090b] border-white/10 transition-all duration-500 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-[0_20px_70px_rgba(59,130,246,0.25)] active:scale-[0.99]">
+        <Card className="bg-white border-[#E1E6EC] transition-all duration-500 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-[0_20px_70px_rgba(59,130,246,0.25)] active:scale-[0.99]">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
+            <CardTitle className="text-[#121317] flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-400 transition-transform duration-500 hover:rotate-3" />
               Performance Pulse
             </CardTitle>
@@ -342,18 +342,18 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
           <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <CircularStat value={passRate} label="Pass Rate" caption="Persentase area yang memenuhi standar audit." />
             <div className="space-y-4">
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-4 transition-all duration-300 hover:border-white/40 hover:-translate-y-1">
-                <p className="text-sm text-muted-foreground">Total Findings</p>
-                <p className="text-5xl font-heading font-black text-white">{totalFindings}</p>
-                <p className="text-xs text-muted-foreground mt-1">Mencakup seluruh level severity.</p>
+              <div className="rounded-2xl border border-[#E1E6EC] bg-[#F8F9FC] p-4 transition-all duration-300 hover:border-[#E1E6EC] hover:-translate-y-1">
+                <p className="text-sm text-[#6A6A71]">Total Findings</p>
+                <p className="text-5xl font-heading font-black text-[#121317]">{totalFindings}</p>
+                <p className="text-xs text-[#6A6A71] mt-1">Mencakup seluruh level severity.</p>
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3 transition-all duration-300 hover:border-white/40">
-                  <p className="text-xs text-white/60">Checks Evaluated</p>
-                  <p className="text-2xl font-semibold text-white">{detailedRows.length}</p>
+                <div className="rounded-2xl border border-[#E1E6EC] bg-[#F8F9FC] p-3 transition-all duration-300 hover:border-[#E1E6EC]">
+                  <p className="text-xs text-[#121317]/60">Checks Evaluated</p>
+                  <p className="text-2xl font-semibold text-[#121317]">{detailedRows.length}</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3 transition-all duration-300 hover:border-white/40">
-                  <p className="text-xs text-white/60">Validated (PASS)</p>
+                <div className="rounded-2xl border border-[#E1E6EC] bg-[#F8F9FC] p-3 transition-all duration-300 hover:border-[#E1E6EC]">
+                  <p className="text-xs text-[#121317]/60">Validated (PASS)</p>
                   <p className="text-2xl font-semibold text-emerald-300">{passedChecks}</p>
                 </div>
               </div>
@@ -361,11 +361,11 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
           </CardContent>
         </Card>
 
-        <Card className="bg-[#09090b] border-white/10 transition-all duration-500 hover:-translate-y-1 hover:border-purple-500/30 hover:shadow-[0_20px_70px_rgba(168,85,247,0.25)]">
+        <Card className="bg-white border-[#E1E6EC] transition-all duration-500 hover:-translate-y-1 hover:border-purple-500/30 hover:shadow-[0_20px_70px_rgba(168,85,247,0.25)]">
           <CardHeader className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <CardTitle className="text-white">Severity Distribution</CardTitle>
+                <CardTitle className="text-[#121317]">Severity Distribution</CardTitle>
                 <CardDescription>Proporsi temuan berdasarkan tingkat risiko.</CardDescription>
               </div>
             </div>
@@ -379,8 +379,8 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
                     className={cn(
                       "rounded-2xl border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-all duration-200 hover:-translate-y-0.5 active:scale-95",
                       isActive
-                        ? "border-white text-white bg-white/10 shadow-[0_10px_30px_rgba(255,255,255,0.15)]"
-                        : "border-white/15 text-white/70 hover:border-white/40"
+                        ? "border-white text-[#121317] bg-white/10 shadow-[0_10px_30px_rgba(255,255,255,0.15)]"
+                        : "border-[#E1E6EC] text-[#45474D] hover:border-[#E1E6EC]"
                     )}
                   >
                     {option === "ALL" ? "All" : option}
@@ -394,20 +394,20 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
               const styles = severityStyles[severity];
               return (
                 <div key={severity} className="space-y-2">
-                  <div className="flex items-center justify-between text-xs text-white/70">
+                  <div className="flex items-center justify-between text-xs text-[#45474D]">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white transition-transform duration-300 hover:scale-105">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#E1E6EC] bg-[#F8F9FC] text-[#121317] transition-transform duration-300 hover:scale-105">
                         {styles.icon}
                       </span>
                       <span className="font-semibold">{severity}</span>
                     </div>
-                    <span className="font-mono text-white/80">
+                    <span className="font-mono text-[#45474D]">
                       {count} · {clampPercentage(percent)}%
                     </span>
                   </div>
-                  <div className="h-2.5 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-2.5 rounded-full bg-[#F8F9FC] overflow-hidden">
                     <div
-                      className={cn("h-full rounded-full bg-gradient-to-r transition-all duration-500", styles.bar)}
+                      className={cn("h-full rounded-full transition-all duration-500", styles.bar)}
                       style={{ width: `${clampPercentage(percent)}%` }}
                     />
                   </div>
@@ -418,9 +418,9 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
         </Card>
       </div>
 
-      <Card className="bg-[#09090b] border-white/10 transition-all duration-500 hover:-translate-y-1 hover:border-emerald-500/30 hover:shadow-[0_20px_70px_rgba(16,185,129,0.25)]">
+      <Card className="bg-white border-[#E1E6EC] transition-all duration-500 hover:-translate-y-1 hover:border-emerald-500/30 hover:shadow-[0_20px_70px_rgba(16,185,129,0.25)]">
         <CardHeader>
-          <CardTitle className="text-white">Actionable Recommendations</CardTitle>
+          <CardTitle className="text-[#121317]">Actionable Recommendations</CardTitle>
           <CardDescription>Prioritas eksekusi berdasarkan temuan report.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -428,28 +428,28 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
             <ol className="space-y-4">
               {filteredRecommendations.map((item, index) => (
                 <li key={`${item.area}-${index}`} className="flex gap-3 transition-all duration-300 hover:-translate-y-1">
-                  <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold text-white/80">
+                  <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold text-[#45474D]">
                     {index + 1}
                   </span>
-                  <div className="flex-1 rounded-2xl border border-white/10 bg-black/20 p-4 transition-all duration-300 hover:border-white/40">
+                  <div className="flex-1 rounded-2xl border border-[#E1E6EC] bg-[#F8F9FC] p-4 transition-all duration-300 hover:border-[#E1E6EC]">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-white">{item.area}</p>
+                      <p className="text-sm font-semibold text-[#121317]">{item.area}</p>
                       <SeverityBadge level={item.severity} />
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1 leading-6">{item.recommendation}</p>
+                    <p className="text-sm text-[#6A6A71] mt-1 leading-6">{item.recommendation}</p>
                   </div>
                 </li>
               ))}
             </ol>
           ) : (
-            <p className="text-sm text-muted-foreground">Tidak ada rekomendasi untuk severity ini.</p>
+            <p className="text-sm text-[#6A6A71]">Tidak ada rekomendasi untuk severity ini.</p>
           )}
         </CardContent>
       </Card>
 
-      <Card className="bg-[#09090b] border-white/10 transition-all duration-500 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-[0_20px_70px_rgba(59,130,246,0.25)]">
+      <Card className="bg-white border-[#E1E6EC] transition-all duration-500 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-[0_20px_70px_rgba(59,130,246,0.25)]">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="text-[#121317] flex items-center gap-2">
             <FileText className="h-5 w-5 text-blue-400 transition-transform duration-500 hover:rotate-3" />
             Detailed Findings Matrix
           </CardTitle>
@@ -459,9 +459,9 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
         </CardHeader>
         <CardContent>
           {filteredRows.length ? (
-            <div className="overflow-x-auto rounded-2xl border border-white/10">
+            <div className="overflow-x-auto rounded-2xl border border-[#E1E6EC]">
               <table className="w-full text-sm">
-                <thead className="bg-white/5 text-white/70">
+                <thead className="bg-[#F8F9FC] text-[#45474D]">
                   <tr>
                     <th className="px-4 py-3 text-left">Area</th>
                     <th className="px-4 py-3 text-left">Quality Gate</th>
@@ -472,14 +472,14 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
                   {filteredRows.map((row, index) => (
                     <tr
                       key={`${row.area}-${index}`}
-                      className="border-t border-white/10 transition-colors duration-200 hover:bg-white/5"
+                      className="border-t border-[#E1E6EC] transition-colors duration-200 hover:bg-[#F8F9FC]"
                     >
-                      <td className="px-4 py-3 font-medium text-white">{row.area}</td>
+                      <td className="px-4 py-3 font-medium text-[#121317]">{row.area}</td>
                       <td className="px-4 py-3 space-y-2">
                         <Badge
                           variant={row.status.toUpperCase() === "PASS" ? "outline" : "destructive"}
                           className={cn(
-                            "border-white/15 text-xs font-semibold transition-all duration-300 hover:scale-[1.03]",
+                            "border-[#E1E6EC] text-xs font-semibold transition-all duration-300 hover:scale-[1.03]",
                             row.status.toUpperCase() === "PASS"
                               ? "text-emerald-200"
                               : "text-amber-200 bg-amber-500/15"
@@ -490,8 +490,8 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
                         <SeverityBadge level={row.severity} />
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-sm text-white leading-6">{row.finding}</p>
-                        <p className="text-xs text-white/60 mt-2">Recommendation: {row.recommendation}</p>
+                        <p className="text-sm text-[#121317] leading-6">{row.finding}</p>
+                        <p className="text-xs text-[#121317]/60 mt-2">Recommendation: {row.recommendation}</p>
                       </td>
                     </tr>
                   ))}
@@ -499,17 +499,17 @@ export default async function CodeReviewPage({ searchParams }: CodeReviewPagePro
               </table>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Tidak ada temuan untuk severity ini.</p>
+            <p className="text-sm text-[#6A6A71]">Tidak ada temuan untuk severity ini.</p>
           )}
         </CardContent>
       </Card>
 
-      <Card className="bg-[#09090b] border-white/10 transition-all duration-500 hover:-translate-y-1 hover:border-white/40">
+      <Card className="bg-white border-[#E1E6EC] transition-all duration-500 hover:-translate-y-1 hover:border-[#E1E6EC]">
         <CardHeader>
-          <CardTitle className="text-white">Executive Summary</CardTitle>
+          <CardTitle className="text-[#121317]">Executive Summary</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground leading-6">{conclusion}</p>
+          <p className="text-sm text-[#6A6A71] leading-6">{conclusion}</p>
         </CardContent>
       </Card>
     </section>
