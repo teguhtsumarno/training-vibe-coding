@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -44,6 +44,7 @@ export default function SmtpSettingsPage() {
   const [testEmail, setTestEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [hasExisting, setHasExisting] = useState(false);
+  const [passwordEdited, setPasswordEdited] = useState(false);
 
   useEffect(() => {
     if (session && session.role !== "admin") {
@@ -57,8 +58,9 @@ export default function SmtpSettingsPage() {
       const res = await fetch("/api/smtp-settings");
       const json = await res.json();
       if (json.success && json.data) {
-        setForm(json.data);
+        setForm({ ...json.data, password: "" });
         setHasExisting(true);
+        setPasswordEdited(false);
       }
     } catch {
       // No settings yet
@@ -253,14 +255,18 @@ export default function SmtpSettingsPage() {
                       <Input
                         type={showPassword ? "text" : "password"}
                         value={form.password}
-                        onChange={(e) => updateField("password", e.target.value)}
-                        placeholder="••••••••"
+                        onChange={(e) => {
+                          updateField("password", e.target.value);
+                          setPasswordEdited(true);
+                        }}
+                        placeholder={hasExisting && !passwordEdited ? "Password tersimpan (kosongkan jika tidak ingin mengubah)" : "Masukkan password"}
                         className="bg-white border-[#E1E6EC] rounded-xl focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-300 pr-10"
                       />
                       <button
                         type="button"
+                        tabIndex={-1}
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6A6A71] hover:text-[#121317] transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6A6A71] hover:text-[#121317] transition-colors cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>

@@ -11,11 +11,12 @@ import { Label } from "@/components/ui/label";
 import { loginSchema, type LoginFormValues } from "@/validators/login-validator";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants";
-import { ArrowRight, KeyRound } from "lucide-react";
+import { ArrowRight, KeyRound, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isAuthenticated, isLoading } = useAuth();
 
   const {
@@ -91,13 +92,23 @@ export default function LoginPage() {
               <Label htmlFor="password" className="text-[14.5px] font-medium text-[#121317]">
                 Password
               </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                {...register("password")}
-                className="h-11 bg-white border-[#E1E6EC] rounded-lg px-3.5 text-[16px] placeholder:text-[#AAB1CC] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  {...register("password")}
+                  className="h-11 bg-white border-[#E1E6EC] rounded-lg px-3.5 pr-10 text-[16px] placeholder:text-[#AAB1CC] focus:border-[#3279F9] focus:ring-[3px] focus:ring-[rgba(50,121,249,0.1)] transition-all duration-200"
+                />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6A6A71] hover:text-[#121317] transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-[14.5px] text-[#FF0000]">{errors.password.message}</p>
               )}
